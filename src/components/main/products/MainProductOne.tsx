@@ -12,7 +12,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#FF6B9D",
             img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
             productsCount: 42,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 2,
@@ -22,7 +22,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#4A90E2",
             img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
             productsCount: 36,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 3,
@@ -32,7 +32,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#48BB78",
             img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
             productsCount: 28,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 4,
@@ -42,7 +42,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#ED8936",
             img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
             productsCount: 19,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 5,
@@ -52,7 +52,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#4299E1",
             img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
             productsCount: 31,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 6,
@@ -62,7 +62,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#9F7AEA",
             img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
             productsCount: 24,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 7,
@@ -72,7 +72,7 @@ function MainProductOne({ navigate }: {
             accentColor: "#FC8181",
             img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
             productsCount: 47,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         },
         {
             id: 8,
@@ -82,12 +82,12 @@ function MainProductOne({ navigate }: {
             accentColor: "#38B2AC",
             img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
             productsCount: 22,
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
+            navigate: routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
         }
     ];
 
     return (
-        <div className="w-full flex flex-col gap-10 py-12 px-4 md:px-8 bg-gradient-to-b from-white to-amber-50">
+        <div className="w-full flex flex-col gap-10 py-12 px-4 md:px-8 ">
             {/* Header Section */}
             <div className="flex flex-col items-center text-center gap-4 ">
                 <div className="relative">
@@ -222,7 +222,7 @@ function MainProductOne({ navigate }: {
                         <p className="text-amber-100">Browse all our premium collections in one place</p>
                     </div>
 
-                    <button className="group relative px-8 py-4 rounded-xl font-bold text-amber-600 bg-white hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3">
+                    <button onClick={() => navigate(routePath.PRIVATE_ROUTE.COLLECTION_PAGE)} className="group cursor-pointer relative px-8 py-4 rounded-xl font-bold text-amber-600 bg-white hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3">
                         Explore All Collections
                         <svg
                             className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"

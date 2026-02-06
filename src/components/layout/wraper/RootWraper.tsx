@@ -41,7 +41,7 @@ function RootWraper({ children }: any) {
             }
             <div className="flex-1 px-6 pt-4 relative ">
                 {
-                    location === routePath.PRIVATE_ROUTE.DASHBOARD_PAGE && routePath.PRIVATE_ROUTE.SHOP_PAGE && routePath.PRIVATE_ROUTE.ABOUT_PAGE && routePath.PRIVATE_ROUTE.SUPPORT_PAGE && routePath.PRIVATE_ROUTE.SHOP_PAGE && routePath.PRIVATE_ROUTE.WISHLIST_PAGE && routePath.PRIVATE_ROUTE.CART_PAGE && routePath.PRIVATE_ROUTE.PROFILE_PAGE ? <MainHeader /> : null
+                    location === routePath.PRIVATE_ROUTE.DASHBOARD_PAGE || routePath.PRIVATE_ROUTE.SHOP_PAGE || routePath.PRIVATE_ROUTE.ABOUT_PAGE || routePath.PRIVATE_ROUTE.SUPPORT_PAGE || routePath.PRIVATE_ROUTE.SHOP_PAGE || routePath.PRIVATE_ROUTE.WISHLIST_PAGE || routePath.PRIVATE_ROUTE.CART_PAGE || routePath.PRIVATE_ROUTE.PROFILE_PAGE ? <MainHeader /> : null
                 }
                 {children}
             </div>

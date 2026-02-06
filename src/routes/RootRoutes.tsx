@@ -17,6 +17,7 @@ import WishlistPage from "../page/main/WishlistPage";
 import ProfilePage from "../page/main/ProfilePage";
 import ProductCollectionPage from "../page/main/products/ProductCollectionPage";
 import ShowProduct from "../page/main/products/ShowProduct";
+import ShowListPoduct from "../page/main/products/ShowListPoduct";
 
 function App() {
     const location = useLocation();
@@ -47,6 +48,8 @@ function App() {
                     } element={<ProductCollectionPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE
                     } element={<ShowProduct />} />
+                    <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
+                    } element={<ShowListPoduct />} />
                 </Route>
             </Routes>
         </AnimatePresence>

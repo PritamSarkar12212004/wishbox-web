@@ -1,3 +1,6 @@
+import { useNavigate } from "react-router-dom";
+import routePath from "../../../consts/routes/routePath";
+
 function MainTopSellingProducts() {
     const collections = [
         {
@@ -73,7 +76,7 @@ function MainTopSellingProducts() {
             img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
         }
     ];
-
+    const navigation = useNavigate()
     return (
         <div className='w-full flex flex-col gap-8 py-12 px-4 md:px-8'>
             <div className="w-full flex flex-col items-center justify-center gap-4">
@@ -92,9 +95,10 @@ function MainTopSellingProducts() {
 
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {collections.map((item, index) => (
-                    <div
+                    <button
+                        onClick={()=>navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE)}
                         key={item.id + '-' + index}
-                        className="group relative overflow-hidden rounded-3xl shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+                        className="group cursor-pointer relative overflow-hidden rounded-3xl shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
                         style={{ backgroundColor: item.bgColor }}
                     >
                         {/* Background gradient accent */}
@@ -191,22 +195,9 @@ function MainTopSellingProducts() {
                             </button>
                         </div>
 
-                       
-                    </div>
-                ))}
-            </div>
 
-            {/* View All Button */}
-            <div className="w-full flex items-center justify-center mt-8">
-                <div className="group relative cursor-pointer px-8 py-4 rounded-full font-semibold text-gray-900 border-2 border-amber-500 overflow-hidden transition-all duration-300 hover:text-white hover:border-amber-600">
-                    <span className="relative z-10">View All Products</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                    <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 group-hover:translate-x-2 transition-transform duration-300">
-                        <svg className="w-6 h-6 text-amber-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </div>
-                </div>
+                    </button>
+                ))}
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import routePath from '../../../consts/routes/routePath';
 import { useState, useEffect, useRef } from 'react';
-import ScrollReveal from '../../../components/ui/animation/ScrollReveal';
 
 function ProductCollectionPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -459,15 +459,13 @@ function ProductCollectionPage() {
         setShowSuggestions(false);
     };
 
-    // Handle collection click
-    const handleCollectionClick = (navigateTo: any) => {
-        navigateTo(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE)
-    };
+
 
     const popularTags = [
         "Birthday", "Wedding", "Party", "Festive", "Home Decor",
         "Premium", "Handmade", "Seasonal", "Floral", "Traditional"
     ];
+    const navigation = useNavigate()
 
     return (
         <div className='flex-1 flex gap-8 flex-col pb-20 relative '>
@@ -601,9 +599,9 @@ function ProductCollectionPage() {
                 ) : (
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                         {filteredCollections.map((item: any, index: any) => (
-                            <div
+                            <button
                                 key={item.id + '-' + index}
-                                onClick={() => handleCollectionClick(item.navigate)}
+                                onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE)}
                                 className='group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100'
                             >
                                 {/* Background pattern */}
@@ -697,7 +695,7 @@ function ProductCollectionPage() {
                                     className='absolute top-0 right-0 w-16 h-16 rounded-bl-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500'
                                     style={{ backgroundColor: item.accentColor }}
                                 ></div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                 )}
