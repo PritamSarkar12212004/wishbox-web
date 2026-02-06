@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import routePath from '../../../consts/routes/routePath';
 import { useState, useEffect, useRef } from 'react';
+import ProductCollectionSuggestion from '../../../data/ProductCollectionSuggestion';
+import ProductCollcationData from '../../../data/ProductCollcationData';
+import ProductCollectionCard from '../../../components/card/ProductCollectionCard';
+import ProductCollectionPopularTag from '../../../data/ProductCollectionPopularTag';
 
 function ProductCollectionPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -8,424 +11,8 @@ function ProductCollectionPage() {
     const [filteredCollections, setFilteredCollections] = useState<any>([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const searchRef = useRef(null);
-    const collections = [
-        {
-            id: 1,
-            title: "Party Garlands",
-            subtitle: "Premium Handmade Decor",
-            bgColor: "#FFE8F0",
-            accentColor: "#FF6B9D",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 42,
-            category: "Party",
-            tags: ["garlands", "party", "decorations", "celebration"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 2,
-            title: "Paper Flowers",
-            subtitle: "Elegant Floral Creations",
-            bgColor: "#F0F7FF",
-            accentColor: "#4A90E2",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 36,
-            category: "Floral",
-            tags: ["flowers", "floral", "elegant", "wedding"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 3,
-            title: "Birthday Decor",
-            subtitle: "Colorful Celebration Sets",
-            bgColor: "#F0FFF4",
-            accentColor: "#48BB78",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 28,
-            category: "Party",
-            tags: ["birthday", "celebration", "colorful", "sets"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 4,
-            title: "Wedding Backdrops",
-            subtitle: "Luxury Paper Designs",
-            bgColor: "#FFF7E6",
-            accentColor: "#ED8936",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-            productsCount: 19,
-            category: "Wedding",
-            tags: ["wedding", "luxury", "backdrops", "premium"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 5,
-            title: "Festive Lanterns",
-            subtitle: "Traditional & Modern",
-            bgColor: "#E6F7FF",
-            accentColor: "#4299E1",
-            img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-            productsCount: 31,
-            category: "Festive",
-            tags: ["lanterns", "festive", "traditional", "diwali"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 6,
-            title: "Decorative Fans",
-            subtitle: "Wall & Ceiling Decor",
-            bgColor: "#F9F0FF",
-            accentColor: "#9F7AEA",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 24,
-            category: "Home Decor",
-            tags: ["fans", "wall decor", "ceiling", "interior"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 7,
-            title: "Paper Streamers",
-            subtitle: "Vibrant Party Decorations",
-            bgColor: "#FFF0F3",
-            accentColor: "#FC8181",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 47,
-            category: "Party",
-            tags: ["streamers", "vibrant", "party", "colorful"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 8,
-            title: "Seasonal Decor",
-            subtitle: "Holiday Special Editions",
-            bgColor: "#F0FFF8",
-            accentColor: "#38B2AC",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 22,
-            category: "Seasonal",
-            tags: ["seasonal", "holiday", "christmas", "festive"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 1,
-            title: "Party Garlands",
-            subtitle: "Premium Handmade Decor",
-            bgColor: "#FFE8F0",
-            accentColor: "#FF6B9D",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 42,
-            category: "Party",
-            tags: ["garlands", "party", "decorations", "celebration"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 2,
-            title: "Paper Flowers",
-            subtitle: "Elegant Floral Creations",
-            bgColor: "#F0F7FF",
-            accentColor: "#4A90E2",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 36,
-            category: "Floral",
-            tags: ["flowers", "floral", "elegant", "wedding"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 3,
-            title: "Birthday Decor",
-            subtitle: "Colorful Celebration Sets",
-            bgColor: "#F0FFF4",
-            accentColor: "#48BB78",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 28,
-            category: "Party",
-            tags: ["birthday", "celebration", "colorful", "sets"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 4,
-            title: "Wedding Backdrops",
-            subtitle: "Luxury Paper Designs",
-            bgColor: "#FFF7E6",
-            accentColor: "#ED8936",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-            productsCount: 19,
-            category: "Wedding",
-            tags: ["wedding", "luxury", "backdrops", "premium"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 5,
-            title: "Festive Lanterns",
-            subtitle: "Traditional & Modern",
-            bgColor: "#E6F7FF",
-            accentColor: "#4299E1",
-            img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-            productsCount: 31,
-            category: "Festive",
-            tags: ["lanterns", "festive", "traditional", "diwali"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 6,
-            title: "Decorative Fans",
-            subtitle: "Wall & Ceiling Decor",
-            bgColor: "#F9F0FF",
-            accentColor: "#9F7AEA",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 24,
-            category: "Home Decor",
-            tags: ["fans", "wall decor", "ceiling", "interior"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 7,
-            title: "Paper Streamers",
-            subtitle: "Vibrant Party Decorations",
-            bgColor: "#FFF0F3",
-            accentColor: "#FC8181",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 47,
-            category: "Party",
-            tags: ["streamers", "vibrant", "party", "colorful"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 8,
-            title: "Seasonal Decor",
-            subtitle: "Holiday Special Editions",
-            bgColor: "#F0FFF8",
-            accentColor: "#38B2AC",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 22,
-            category: "Seasonal",
-            tags: ["seasonal", "holiday", "christmas", "festive"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 1,
-            title: "Party Garlands",
-            subtitle: "Premium Handmade Decor",
-            bgColor: "#FFE8F0",
-            accentColor: "#FF6B9D",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 42,
-            category: "Party",
-            tags: ["garlands", "party", "decorations", "celebration"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 2,
-            title: "Paper Flowers",
-            subtitle: "Elegant Floral Creations",
-            bgColor: "#F0F7FF",
-            accentColor: "#4A90E2",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 36,
-            category: "Floral",
-            tags: ["flowers", "floral", "elegant", "wedding"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 3,
-            title: "Birthday Decor",
-            subtitle: "Colorful Celebration Sets",
-            bgColor: "#F0FFF4",
-            accentColor: "#48BB78",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 28,
-            category: "Party",
-            tags: ["birthday", "celebration", "colorful", "sets"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 4,
-            title: "Wedding Backdrops",
-            subtitle: "Luxury Paper Designs",
-            bgColor: "#FFF7E6",
-            accentColor: "#ED8936",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-            productsCount: 19,
-            category: "Wedding",
-            tags: ["wedding", "luxury", "backdrops", "premium"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 5,
-            title: "Festive Lanterns",
-            subtitle: "Traditional & Modern",
-            bgColor: "#E6F7FF",
-            accentColor: "#4299E1",
-            img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-            productsCount: 31,
-            category: "Festive",
-            tags: ["lanterns", "festive", "traditional", "diwali"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 6,
-            title: "Decorative Fans",
-            subtitle: "Wall & Ceiling Decor",
-            bgColor: "#F9F0FF",
-            accentColor: "#9F7AEA",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 24,
-            category: "Home Decor",
-            tags: ["fans", "wall decor", "ceiling", "interior"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 7,
-            title: "Paper Streamers",
-            subtitle: "Vibrant Party Decorations",
-            bgColor: "#FFF0F3",
-            accentColor: "#FC8181",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 47,
-            category: "Party",
-            tags: ["streamers", "vibrant", "party", "colorful"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 8,
-            title: "Seasonal Decor",
-            subtitle: "Holiday Special Editions",
-            bgColor: "#F0FFF8",
-            accentColor: "#38B2AC",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 22,
-            category: "Seasonal",
-            tags: ["seasonal", "holiday", "christmas", "festive"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 1,
-            title: "Party Garlands",
-            subtitle: "Premium Handmade Decor",
-            bgColor: "#FFE8F0",
-            accentColor: "#FF6B9D",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 42,
-            category: "Party",
-            tags: ["garlands", "party", "decorations", "celebration"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 2,
-            title: "Paper Flowers",
-            subtitle: "Elegant Floral Creations",
-            bgColor: "#F0F7FF",
-            accentColor: "#4A90E2",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 36,
-            category: "Floral",
-            tags: ["flowers", "floral", "elegant", "wedding"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 3,
-            title: "Birthday Decor",
-            subtitle: "Colorful Celebration Sets",
-            bgColor: "#F0FFF4",
-            accentColor: "#48BB78",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 28,
-            category: "Party",
-            tags: ["birthday", "celebration", "colorful", "sets"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 4,
-            title: "Wedding Backdrops",
-            subtitle: "Luxury Paper Designs",
-            bgColor: "#FFF7E6",
-            accentColor: "#ED8936",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-            productsCount: 19,
-            category: "Wedding",
-            tags: ["wedding", "luxury", "backdrops", "premium"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 5,
-            title: "Festive Lanterns",
-            subtitle: "Traditional & Modern",
-            bgColor: "#E6F7FF",
-            accentColor: "#4299E1",
-            img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-            productsCount: 31,
-            category: "Festive",
-            tags: ["lanterns", "festive", "traditional", "diwali"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 6,
-            title: "Decorative Fans",
-            subtitle: "Wall & Ceiling Decor",
-            bgColor: "#F9F0FF",
-            accentColor: "#9F7AEA",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            productsCount: 24,
-            category: "Home Decor",
-            tags: ["fans", "wall decor", "ceiling", "interior"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 7,
-            title: "Paper Streamers",
-            subtitle: "Vibrant Party Decorations",
-            bgColor: "#FFF0F3",
-            accentColor: "#FC8181",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            productsCount: 47,
-            category: "Party",
-            tags: ["streamers", "vibrant", "party", "colorful"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-        {
-            id: 8,
-            title: "Seasonal Decor",
-            subtitle: "Holiday Special Editions",
-            bgColor: "#F0FFF8",
-            accentColor: "#38B2AC",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            productsCount: 22,
-            category: "Seasonal",
-            tags: ["seasonal", "holiday", "christmas", "festive"],
-            navigate: routePath.PRIVATE_ROUTE.COLLECTION_PAGE
-        },
-    ];
-    const suggestions = [
-        "Party Garlands",
-        "Paper Flowers",
-        "Birthday Decor",
-        "Wedding Backdrops",
-        "Festive Lanterns",
-        "Seasonal Decorations",
-        "Paper Streamers",
-        "Home Decor",
-        "Premium Collections",
-        "Party Garlands",
-        "Paper Flowers",
-        "Birthday Decor",
-        "Wedding Backdrops",
-        "Festive Lanterns",
-        "Seasonal Decorations",
-        "Paper Streamers",
-        "Home Decor",
-        "Premium Collections",
-        "Party Garlands",
-        "Paper Flowers",
-        "Birthday Decor",
-        "Wedding Backdrops",
-        "Festive Lanterns",
-        "Seasonal Decorations",
-        "Paper Streamers",
-        "Home Decor",
-        "Premium Collections",
-    ];
-
     useEffect(() => {
-        let filtered = collections;
+        let filtered = ProductCollcationData;
 
         if (selectedCategory !== 'All') {
             filtered = filtered.filter(item => item.category === selectedCategory);
@@ -459,14 +46,7 @@ function ProductCollectionPage() {
         setShowSuggestions(false);
     };
 
-
-
-    const popularTags = [
-        "Birthday", "Wedding", "Party", "Festive", "Home Decor",
-        "Premium", "Handmade", "Seasonal", "Floral", "Traditional"
-    ];
     const navigation = useNavigate()
-
     return (
         <div className='flex-1 flex gap-8 flex-col pb-20 relative '>
             <div className='w-full bg-white/95 backdrop-blur-sm sticky top-0 z-50 shadow-lg border-b border-gray-100'>
@@ -480,7 +60,6 @@ function ProductCollectionPage() {
                                         d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
                                 </svg>
                             </div>
-
                             <input
                                 type='text'
                                 value={searchQuery}
@@ -517,7 +96,7 @@ function ProductCollectionPage() {
                                         </div>
 
                                         <div className='flex flex-wrap gap-2 mb-4'>
-                                            {popularTags.map((tag, index) => (
+                                            {ProductCollectionPopularTag.map((tag, index) => (
                                                 <button
                                                     key={index}
                                                     onClick={() => handleSuggestionClick(tag)}
@@ -529,7 +108,7 @@ function ProductCollectionPage() {
                                         </div>
 
                                         <div className='space-y-1 max-h-64 overflow-y-auto'>
-                                            {suggestions
+                                            {ProductCollectionSuggestion
                                                 .filter(suggestion =>
                                                     suggestion.toLowerCase().includes(searchQuery.toLowerCase())
                                                 )
@@ -571,8 +150,6 @@ function ProductCollectionPage() {
 
                 </div>
             </div>
-
-            {/* Collections Grid */}
             <div className='container mx-auto px-4 md:px-8'>
                 {filteredCollections.length === 0 ? (
                     <div className='flex flex-col items-center justify-center py-20'>
@@ -599,103 +176,7 @@ function ProductCollectionPage() {
                 ) : (
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                         {filteredCollections.map((item: any, index: any) => (
-                            <button
-                                key={item.id + '-' + index}
-                                onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE)}
-                                className='group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100'
-                            >
-                                {/* Background pattern */}
-                                <div
-                                    className='absolute inset-0 opacity-5'
-                                    style={{ backgroundColor: item.accentColor }}
-                                ></div>
-
-                                {/* Card Header */}
-                                <div className='relative p-6'>
-                                    <div className='flex items-start justify-between mb-4'>
-                                        <div>
-                                            <div className='flex items-center gap-2 mb-2'>
-                                                <span className='px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700'>
-                                                    {item.category}
-                                                </span>
-                                                <span className='px-2 py-1 text-xs font-bold rounded-full text-white shadow-sm'
-                                                    style={{ backgroundColor: item.accentColor }}>
-                                                    {item.productsCount}+ items
-                                                </span>
-                                            </div>
-                                            <h3 className='text-xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors'>
-                                                {item.title}
-                                            </h3>
-                                            <p className='text-gray-600 text-sm mt-1'>
-                                                {item.subtitle}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Image Container */}
-                                <div className='relative px-6'>
-                                    <div
-                                        className='relative overflow-hidden rounded-xl shadow-lg group-hover:shadow-xl transition-shadow duration-500'
-                                        style={{ backgroundColor: item.bgColor }}
-                                    >
-                                        <div className='absolute inset-0 bg-gradient-to-br from-white/10 to-transparent z-10'></div>
-                                        <img
-                                            src={item.img}
-                                            alt={item.title}
-                                            className='w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-700'
-                                        />
-
-                                        {/* Overlay gradient */}
-                                        <div className='absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent'></div>
-
-                                        {/* Quick action button */}
-                                        <div className='absolute bottom-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110 hover:bg-white shadow-lg z-20'>
-                                            <svg className='w-5 h-5' style={{ color: item.accentColor }} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M14 5l7 7m0 0l-7 7m7-7H3' />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Card Footer */}
-                                <div className='p-6 pt-4'>
-                                    <div className='flex items-center justify-between'>
-                                        <div className='flex items-center gap-2'>
-                                            <div className='flex text-amber-400'>
-                                                {[...Array(4)].map((_, i) => (
-                                                    <svg key={i} className='w-4 h-4 fill-current' viewBox='0 0 20 20'>
-                                                        <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
-                                                    </svg>
-                                                ))}
-                                                <svg className='w-4 h-4 fill-current text-gray-300' viewBox='0 0 20 20'>
-                                                    <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
-                                                </svg>
-                                            </div>
-                                            <span className='text-sm text-gray-600'>4.2</span>
-                                        </div>
-
-                                        <button
-                                            className='px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:shadow-md hover:scale-105 active:scale-95 flex items-center gap-2'
-                                            style={{
-                                                backgroundColor: item.bgColor,
-                                                color: item.accentColor
-                                            }}
-                                        >
-                                            View Collection
-                                            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Decorative corner */}
-                                <div
-                                    className='absolute top-0 right-0 w-16 h-16 rounded-bl-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500'
-                                    style={{ backgroundColor: item.accentColor }}
-                                ></div>
-                            </button>
+                            <ProductCollectionCard index={index} item={item} navigation={navigation} />
                         ))}
                     </div>
                 )}
