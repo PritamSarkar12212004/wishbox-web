@@ -1,4 +1,4 @@
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import routePath from "../../../consts/routes/routePath";
 
 function ShowListPoduct() {
@@ -225,14 +225,14 @@ function ShowListPoduct() {
   const navigation = useNavigate()
   return (
     <div className='w-full flex flex-col gap-8 py-12 px-4 md:px-8'>
-      <div className=" mx-auto">
+      <div className="   mx-auto">
         <div className="relative mb-12">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-100/20 to-rose-100/20 rounded-3xl blur-3xl"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-amber-100/20 to-rose-100/20 rounded-3xl blur-3xl"></div>
           <div className="relative text-center">
             <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+              <div className="w-12 h-px bg-linear-to-r from-transparent via-amber-400 to-transparent"></div>
               <span className="text-amber-600 font-light tracking-[0.3em] text-sm">PREMIUM COLLECTIONS</span>
-              <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+              <div className="w-12 h-px bg-linear-to-r from-transparent via-amber-400 to-transparent"></div>
             </div>
             <h2 className="text-4xl md:text-5xl font-serif font-light text-gray-900 mb-4">
               Handcrafted <span className="font-normal italic text-amber-600">Paper</span> Elegance
@@ -251,7 +251,7 @@ function ShowListPoduct() {
               className="group relative cursor-pointer overflow-hidden rounded-3xl shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
               style={{ backgroundColor: item.bgColor }}
             >
-              {/* Background gradient accent */}
+              {/* Background linear accent */}
               <div
                 className="absolute top-0 left-0 w-full h-1"
                 style={{ backgroundColor: item.bgColor2 }}
@@ -307,7 +307,7 @@ function ShowListPoduct() {
                   className="w-full py-3 cursor-pointer px-4 rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group/btn"
                   style={{
                     backgroundColor: item.bgColor2,
-                    backgroundImage: `linear-gradient(135deg, ${item.bgColor2}, ${item.bgColor}`
+                    backgroundImage: `linear-linear(135deg, ${item.bgColor2}, ${item.bgColor}`
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)';
