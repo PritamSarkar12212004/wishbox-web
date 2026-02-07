@@ -59,7 +59,7 @@ function DashHeroOne({ navigation }: {
                         </button>
 
                         <button
-                            onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOP_PAGE)}
+                            onClick={() => navigation(routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE)}
                             className="px-8 py-4 rounded-2xl font-bold text-neutral-700 border-2 border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-3"
                         >
                             View Gallery

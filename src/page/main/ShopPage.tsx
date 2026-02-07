@@ -11,7 +11,6 @@ function ShopPage() {
     const [filteredCollections, setFilteredCollections] = useState<any>([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
     const [showSidebar, setShowSidebar] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
@@ -1517,7 +1516,6 @@ function ShopPage() {
     const clearAllFilters = () => {
         setSelectedCategory('All');
         setSelectedEvents([]);
-        setPriceRange([0, 5000]);
         setSearchQuery('');
     };
 

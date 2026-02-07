@@ -60,25 +60,6 @@ function ContactPage() {
         { platform: 'LinkedIn', icon: '💼', handle: 'PaperDecor', color: 'bg-blue-100 hover:bg-blue-200 text-blue-700', link: '#' }
     ];
 
-    const faqs = [
-        {
-            question: 'How long does delivery take?',
-            answer: 'Delivery takes 3-7 business days depending on your location. Express delivery available for major cities.'
-        },
-        {
-            question: 'Can I customize decorations?',
-            answer: 'Yes! We specialize in custom designs. Share your requirements and we\'ll create something unique for you.'
-        },
-        {
-            question: 'What materials do you use?',
-            answer: 'We use eco-friendly, biodegradable paper and sustainable materials. All our decorations are handmade.'
-        },
-        {
-            question: 'Do you offer wholesale pricing?',
-            answer: 'Yes, we offer special pricing for bulk orders and event planners. Contact our wholesale team.'
-        }
-    ];
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({
             ...formData,

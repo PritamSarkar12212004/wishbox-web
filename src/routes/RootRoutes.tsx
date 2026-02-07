@@ -11,13 +11,11 @@ import ContactUsPage from "../page/public/ContactUsPage";
 import routePath from "../consts/routes/routePath";
 import AboutPage from "../page/main/AboutPage";
 import ShopPage from "../page/main/ShopPage";
-import ProductsPage from "../page/main/ProductsPage";
 import CartPage from "../page/main/CartPage";
 import WishlistPage from "../page/main/WishlistPage";
-import ProfilePage from "../page/main/ProfilePage";
 import ProductCollectionPage from "../page/main/products/ProductCollectionPage";
 import ShowProduct from "../page/main/products/ShowProduct";
-import ShowListPoduct from "../page/main/products/ShowListPoduct";
+import GaleryPagee from "../page/main/GaleryPagee";
 
 function App() {
     const location = useLocation();
@@ -36,20 +34,16 @@ function App() {
                     <Route path={routePath.PRIVATE_ROUTE.SUPPORT_PAGE} element={<SupportPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.ABOUT_PAGE} element={<AboutPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SHOP_PAGE} element={<ShopPage />} />
-                    <Route path={routePath.PRIVATE_ROUTE.PRODUCT_PAGE
-                    } element={<ProductsPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.CART_PAGE
                     } element={<CartPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.WISHLIST_PAGE
                     } element={<WishlistPage />} />
-                    <Route path={routePath.PRIVATE_ROUTE.PROFILE_PAGE
-                    } element={<ProfilePage />} />
                     <Route path={routePath.PRIVATE_ROUTE.COLLECTION_PAGE
                     } element={<ProductCollectionPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE
                     } element={<ShowProduct />} />
-                    <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
-                    } element={<ShowListPoduct />} />
+                    <Route path={routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE
+                    } element={<GaleryPagee />} />
                 </Route>
             </Routes>
         </AnimatePresence>
