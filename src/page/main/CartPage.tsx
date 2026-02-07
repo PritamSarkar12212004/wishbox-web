@@ -94,7 +94,7 @@ function CartPage() {
 
   return (
     <ScrollReveal>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-scree">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="container mx-auto px-4 py-6">
