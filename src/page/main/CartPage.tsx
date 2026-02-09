@@ -75,23 +75,6 @@ function CartPage() {
   const tax = subtotal * 0.18; // 18% GST
   const total = subtotal + shipping + tax;
 
-  const popularProducts = [
-    {
-      id: 5,
-      name: "Birthday Decoration Kit",
-      price: 1699,
-      image: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-      category: "Birthday Decor"
-    },
-    {
-      id: 6,
-      name: "Paper Fans Wall Decor",
-      price: 799,
-      image: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-      category: "Decorative Fans"
-    }
-  ];
-
   return (
     <ScrollReveal>
       <div className="min-h-scree">

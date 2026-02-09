@@ -1,12 +1,6 @@
 const routePath = {
-  PUBLIC_ROUTE: {
-    INTRO_PAGE: "/",
-    INTRO_ABOUT_PAGE: "/auth/about",
-    INTRO_CONTACT_PAGE: "/auth/contact",
-    Login_Page: "/login",
-  },
   PRIVATE_ROUTE: {
-    DASHBOARD_PAGE: "/dashboard",
+    DASHBOARD_PAGE: "/",
     SUPPORT_PAGE: "/contact",
     SHOP_PAGE: "/shop",
     ABOUT_PAGE: "/about",

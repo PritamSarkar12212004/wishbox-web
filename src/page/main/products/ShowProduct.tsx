@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ScrollReveal from '../../../components/ui/animation/ScrollReveal'
 import { useNavigate } from 'react-router-dom'
 

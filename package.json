@@ -24,6 +24,7 @@
     "lottie-react": "^2.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-medium-image-zoom": "^5.4.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.13.0",
     "react-toastify": "^11.0.5",

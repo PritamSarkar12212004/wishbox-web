@@ -1,13 +1,8 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PrivateRoute from "./PrivateRoutes";
-import PublicRoute from "./PublicRoute";
 import DashboardPage from "../page/main/DashboardPage";
 import SupportPage from "../page/main/SupportPage";
-import LoginPage from "../page/auth/LoginPage";
-import IntroPage from "../page/public/IntroPage";
-import IntroAboutPage from "../page/public/IntroAboutPage";
-import ContactUsPage from "../page/public/ContactUsPage";
 import routePath from "../consts/routes/routePath";
 import AboutPage from "../page/main/AboutPage";
 import ShopPage from "../page/main/ShopPage";
@@ -16,19 +11,13 @@ import WishlistPage from "../page/main/WishlistPage";
 import ProductCollectionPage from "../page/main/products/ProductCollectionPage";
 import ShowProduct from "../page/main/products/ShowProduct";
 import GaleryPagee from "../page/main/GaleryPagee";
-
+import CollectionListPage from "../page/main/CollectionListPage";
 function App() {
     const location = useLocation();
 
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-                <Route element={<PublicRoute />}>
-                    <Route path={routePath.PUBLIC_ROUTE.INTRO_PAGE} element={<IntroPage />} />
-                    <Route path={routePath.PUBLIC_ROUTE.INTRO_ABOUT_PAGE} element={<IntroAboutPage />} />
-                    <Route path={routePath.PUBLIC_ROUTE.INTRO_CONTACT_PAGE} element={<ContactUsPage />} />
-                    <Route path={routePath.PUBLIC_ROUTE.Login_Page} element={<LoginPage />} />
-                </Route>
                 <Route element={<PrivateRoute />}>
                     <Route path={routePath.PRIVATE_ROUTE.DASHBOARD_PAGE} element={<DashboardPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SUPPORT_PAGE} element={<SupportPage />} />
@@ -42,6 +31,8 @@ function App() {
                     } element={<ProductCollectionPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE
                     } element={<ShowProduct />} />
+                    <Route path={routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE
+                    } element={<CollectionListPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE
                     } element={<GaleryPagee />} />
                 </Route>
