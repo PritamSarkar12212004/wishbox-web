@@ -1,48 +1,21 @@
 import { useState } from 'react'
 import ScrollReveal from '../../../components/ui/animation/ScrollReveal'
 import { useNavigate } from 'react-router-dom'
+import { FaStar, FaHeart, FaShare, FaShoppingCart, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa'
 
 function ShowProduct() {
     const navigate = useNavigate();
-    const [selectedSize, setSelectedSize] = useState('A4');
+    const [selectedSize, setSelectedSize] = useState('10×12');
     const [selectedColor, setSelectedColor] = useState('#FF6B9D');
     const [quantity, setQuantity] = useState(100);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const [showVideo, setShowVideo] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
 
-    // Mock product data
     const product = {
         id: 'PPD-2024-001',
         title: 'Premium Handmade Paper Garland',
         category: 'Party Decorations',
-        sku: 'GAR-PREMIUM-001',
-        description: 'Beautifully crafted premium paper garlands made from 100% recycled paper. Perfect for parties, weddings, and festive decorations. Each garland is handcrafted by skilled artisans with attention to detail.',
-        longDescription: `
-            <p>Introducing our exquisite Premium Handmade Paper Garland collection, designed to elevate any celebration. Made from high-quality, eco-friendly recycled paper, these garlands are both sustainable and stunning.</p>
-            
-            <h4>Features:</h4>
-            <ul>
-                <li>100% Recycled & Biodegradable Paper</li>
-                <li>Handcrafted by Skilled Artisans</li>
-                <li>UV Resistant Colors that Last</li>
-                <li>Water-Resistant Coating</li>
-                <li>Flexible & Durable Construction</li>
-                <li>Easy to Install & Remove</li>
-            </ul>
-            
-            <h4>Applications:</h4>
-            <ul>
-                <li>Wedding Decorations</li>
-                <li>Birthday Parties</li>
-                <li>Corporate Events</li>
-                <li>Festival Decor</li>
-                <li>Retail Store Displays</li>
-                <li>Photography Backdrops</li>
-            </ul>
-            
-            <h4>Quality Assurance:</h4>
-            <p>Each garland undergoes 3-stage quality check to ensure perfection. We use non-toxic, child-safe colors and materials.</p>
-        `,
+        description: 'Elegantly crafted premium paper garlands made from 100% recycled eco-friendly materials. Perfect for weddings, parties, and festive celebrations.',
         price: {
             retail: 299,
             wholesale: {
@@ -54,53 +27,44 @@ function ShowProduct() {
             }
         },
         sizes: [
-            { name: 'A4', dimensions: '21cm × 29.7cm', weight: '80gsm' },
-            { name: 'A3', dimensions: '29.7cm × 42cm', weight: '120gsm' },
-            { name: 'Custom', dimensions: 'Variable', weight: 'Custom' }
+            { name: '8×10', dimensions: '8×10 inches' },
+            { name: '10×12', dimensions: '10×12 inches' },
+            { name: '12×16', dimensions: '12×16 inches' },
+            { name: '16×20', dimensions: '16×20 inches' },
+            { name: '20×24', dimensions: '20×24 inches' },
+            { name: '24×36', dimensions: '24×36 inches' }
         ],
         colors: [
-            { name: 'Rose Pink', code: '#FF6B9D', inStock: true },
-            { name: 'Sky Blue', code: '#4A90E2', inStock: true },
-            { name: 'Emerald Green', code: '#48BB78', inStock: true },
-            { name: 'Sunset Orange', code: '#ED8936', inStock: true },
-            { name: 'Royal Purple', code: '#9F7AEA', inStock: false },
-            { name: 'Golden Yellow', code: '#ECC94B', inStock: true }
+            { name: 'Rose Pink', code: '#FF6B9D' },
+            { name: 'Sky Blue', code: '#4A90E2' },
+            { name: 'Emerald', code: '#48BB78' },
+            { name: 'Sunset', code: '#ED8936' },
+            { name: 'Lavender', code: '#9F7AEA' },
+            { name: 'Gold', code: '#ECC94B' }
         ],
         images: [
             'https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg',
             'https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg',
             'https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg',
-            'https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg',
-            'https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg'
+            'https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg'
         ],
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Replace with actual video URL
-        specifications: {
-            material: '100% Recycled Paper',
-            finish: 'Matte with Glossy Accents',
-            packaging: '200 pcs per carton',
-            cartonDimensions: '60cm × 40cm × 30cm',
-            cartonWeight: '8.5kg',
-            moq: '100 pieces',
-            leadTime: '7-10 days',
-            certifications: ['ISO 9001', 'FSC Certified', 'Eco-Friendly']
-        },
-        wholesalePacks: [
-            { name: 'Starter Pack', pieces: 100, price: 19900, save: 33 },
-            { name: 'Business Pack', pieces: 500, price: 84500, save: 43 },
-            { name: 'Premium Pack', pieces: 1000, price: 149000, save: 50 },
-            { name: 'Enterprise Pack', pieces: 5000, price: 645000, save: 56 },
-            { name: 'Bulk Pack', pieces: 10000, price: 990000, save: 66 }
+        specifications: [
+            { label: 'Material', value: 'Recycled Paper' },
+            { label: 'MOQ', value: '100 pieces' },
+            { label: 'Lead Time', value: '7-10 Days' },
+            { label: 'Packaging', value: 'Carton Box' },
+            { label: 'Weight', value: '80 GSM' },
+            { label: 'Certifications', value: 'ISO, FSC' }
         ],
-        ratings: {
-            average: 4.7,
-            total: 245,
-            breakdown: [5, 4, 3, 2, 1]
-        },
-        relatedProducts: [
-            { id: 1, name: 'Paper Flowers', price: 249, image: 'https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg' },
-            { id: 2, name: 'Festive Lanterns', price: 179, image: 'https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg' },
-            { id: 3, name: 'Decorative Fans', price: 329, image: 'https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg' }
-        ]
+        reviews: {
+            rating: 4.8,
+            count: 245,
+            highlights: [
+                { label: 'Quality', value: 4.9 },
+                { label: 'Value', value: 4.7 },
+                { label: 'Delivery', value: 4.8 }
+            ]
+        }
     };
 
     const calculatePrice = () => {
@@ -114,213 +78,140 @@ function ShowProduct() {
 
     const totalPrice = calculatePrice() * quantity;
 
-    const handleAddToCart = () => {
-        // Add to cart logic
-        console.log('Added to cart:', {
-            productId: product.id,
-            title: product.title,
-            size: selectedSize,
-            color: selectedColor,
-            quantity,
-            unitPrice: calculatePrice(),
-            totalPrice
-        });
-    };
-
-    const handleQuickOrder = () => {
-        // Quick order logic
-        console.log('Quick order:', { productId: product.id, quantity });
-    };
-
     return (
         <ScrollReveal>
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-                {/* Product Navigation */}
-                <div className="bg-white border-b border-gray-200">
+            <div className="min-h-screen bg-white">
+                {/* Header Navigation */}
+                <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
                     <div className="container mx-auto px-4 py-3">
-                        <div className="flex items-center text-sm text-gray-600">
-                            <button onClick={() => navigate(-1)} className="hover:text-amber-600 flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                                Back to Collections
-                            </button>
-                            <span className="mx-2">/</span>
-                            <span className="text-gray-400">{product.category}</span>
-                            <span className="mx-2">/</span>
-                            <span className="font-medium text-gray-900">{product.title}</span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button className="p-2 hover:bg-gray-100 rounded-full">
+                                    <FaShare className="w-5 h-5 text-gray-600" />
+                                </button>
+                                <button
+                                    onClick={() => setIsFavorite(!isFavorite)}
+                                    className="p-2 hover:bg-gray-100 rounded-full"
+                                >
+                                    <FaHeart className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-gray-600'}`} />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </nav>
 
-                <div className="container mx-auto px-4 py-8">
-                    {/* Main Product Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                        {/* Left Column - Images & Video */}
-                        <div>
+                {/* Main Content */}
+                <div className="container mx-auto px-4 py-6">
+                    <div className="grid lg:grid-cols-2 gap-8">
+                        {/* Left Column - Images */}
+                        <div className="space-y-4">
                             {/* Main Image */}
-                            <div className="mb-4 rounded-2xl overflow-hidden shadow-xl bg-white border border-gray-200">
-                                {showVideo ? (
-                                    <div className="relative aspect-video">
-                                        <iframe
-                                            src={product.videoUrl}
-                                            className="w-full h-full"
-                                            title="Product Video"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        />
-                                        <button
-                                            onClick={() => setShowVideo(false)}
-                                            className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <img
-                                        src={product.images[activeImageIndex]}
-                                        alt={product.title}
-                                        className="w-full h-auto max-h-[500px] object-contain"
-                                    />
-                                )}
+                            <div className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-white shadow-lg">
+                                <img
+                                    src={product.images[activeImageIndex]}
+                                    alt={product.title}
+                                    className="w-full h-full object-contain p-8"
+                                />
+                                <div className="absolute top-4 left-4">
+                                    <span className="px-3 py-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-bold rounded-full shadow">
+                                        Best Seller
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Thumbnail Gallery */}
-                            <div className="flex gap-3 overflow-x-auto pb-2">
+                            {/* Thumbnails */}
+                            <div className="grid grid-cols-4 gap-3">
                                 {product.images.map((img, index) => (
                                     <button
                                         key={index}
-                                        onClick={() => {
-                                            setActiveImageIndex(index);
-                                            setShowVideo(false);
-                                        }}
-                                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${activeImageIndex === index ? 'border-amber-500' : 'border-gray-200'}`}
+                                        onClick={() => setActiveImageIndex(index)}
+                                        className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === index
+                                            ? 'border-rose-500 shadow-md'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                            }`}
                                     >
-                                        <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
+                                        <img
+                                            src={img}
+                                            alt=""
+                                            className="w-full h-full object-cover"
+                                        />
                                     </button>
                                 ))}
-                                {/* Video Thumbnail */}
-                                <button
-                                    onClick={() => setShowVideo(true)}
-                                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200 relative group hover:border-amber-500"
-                                >
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-600"></div>
-                                </button>
-                            </div>
-
-                            {/* Product SKU & Stock */}
-                            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span className="text-sm text-gray-500">Product ID:</span>
-                                        <p className="font-semibold">{product.id}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-sm text-gray-500">SKU:</span>
-                                        <p className="font-semibold">{product.sku}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-sm text-gray-500">In Stock:</span>
-                                        <p className="font-semibold text-green-600">✓ Available</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-sm text-gray-500">MOQ:</span>
-                                        <p className="font-semibold">{product.specifications.moq}</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
-                        {/* Right Column - Product Details */}
-                        <div>
+                        {/* Right Column - Details */}
+                        <div className="space-y-6">
                             {/* Product Header */}
-                            <div className="mb-6">
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{product.title}</h1>
-                                        <div className="flex items-center gap-4 mb-3">
-                                            <div className="flex items-center">
-                                                <div className="flex text-amber-400">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                        </svg>
-                                                    ))}
-                                                </div>
-                                                <span className="ml-2 text-gray-600">({product.ratings.total} reviews)</span>
-                                            </div>
-                                            <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                                                Best Seller
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button className="p-2 hover:bg-gray-100 rounded-lg">
-                                        <svg className="w-6 h-6 text-gray-400 hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                    </button>
+                            <div>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 rounded-full text-sm font-medium mb-3">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    Premium Quality
                                 </div>
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                                    {product.title}
+                                </h1>
+                                <p className="text-gray-600 mb-4">
+                                    {product.description}
+                                </p>
 
-                                {/* Price Section */}
-                                <div className="mb-6">
-                                    <div className="flex items-baseline gap-3">
-                                        <span className="text-4xl font-bold text-gray-900">₹{calculatePrice()}</span>
-                                        <span className="text-lg text-gray-500 line-through">₹{product.price.retail}</span>
-                                        <span className="px-2 py-1 bg-amber-100 text-amber-800 text-sm font-bold rounded">
-                                            Save {Math.round((1 - calculatePrice() / product.price.retail) * 100)}%
-                                        </span>
+                                {/* Rating */}
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="flex items-center gap-1">
+                                        {[...Array(5)].map((_, i) => (
+                                            <FaStar key={i} className={`w-4 h-4 ${i < Math.floor(product.reviews.rating)
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                                }`} />
+                                        ))}
+                                        <span className="font-bold text-gray-900 ml-1">{product.reviews.rating}</span>
                                     </div>
-                                    <p className="text-gray-600 mt-2">Minimum Order: {product.specifications.moq}</p>
+                                    <span className="text-gray-500">•</span>
+                                    <span className="text-gray-600">{product.reviews.count} reviews</span>
                                 </div>
                             </div>
 
-                            {/* Product Description */}
-                            <div className="mb-8">
-                                <p className="text-gray-700 mb-4">{product.description}</p>
-                                <div dangerouslySetInnerHTML={{ __html: product.longDescription }} className="text-gray-600" />
-                            </div>
-
-                            {/* Size Selection */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Size</h3>
-                                <div className="flex gap-3">
-                                    {product.sizes.map((size) => (
-                                        <button
-                                            key={size.name}
-                                            onClick={() => setSelectedSize(size.name)}
-                                            className={`px-4 py-3 rounded-xl border-2 transition-all ${selectedSize === size.name ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 hover:border-gray-300'}`}
-                                        >
-                                            <div className="font-medium">{size.name}</div>
-                                            <div className="text-sm text-gray-500">{size.dimensions}</div>
-                                        </button>
-                                    ))}
+                            {/* Price Section */}
+                            <div className="bg-gradient-to-r from-gray-50 to-white p-6 rounded-2xl border border-gray-200">
+                                <div className="flex items-baseline gap-3 mb-2">
+                                    <span className="text-4xl font-bold text-gray-900">₹{calculatePrice()}</span>
+                                    <span className="text-lg text-gray-500 line-through">₹{product.price.retail}</span>
+                                    <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full">
+                                        Save {Math.round((1 - calculatePrice() / product.price.retail) * 100)}%
+                                    </span>
+                                </div>
+                                <div className="text-gray-600">
+                                    Total: <span className="text-2xl font-bold text-gray-900 ml-2">₹{totalPrice.toLocaleString()}</span>
                                 </div>
                             </div>
 
                             {/* Color Selection */}
-                            <div className="mb-6">
+                            <div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Color</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {product.colors.map((color) => (
                                         <button
                                             key={color.name}
-                                            onClick={() => color.inStock && setSelectedColor(color.code)}
-                                            disabled={!color.inStock}
-                                            className={`relative rounded-full w-12 h-12 border-2 ${selectedColor === color.code ? 'border-amber-500 ring-2 ring-amber-200' : 'border-gray-300'}`}
-                                            style={{ backgroundColor: color.code }}
-                                            title={`${color.name} ${!color.inStock ? '(Out of Stock)' : ''}`}
+                                            onClick={() => setSelectedColor(color.code)}
+                                            className={`relative group rounded-xl p-3 border-2 transition-all ${selectedColor === color.code
+                                                ? 'border-rose-500 shadow-md'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
                                         >
-                                            {!color.inStock && (
-                                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
-                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            <div
+                                                className="w-10 h-10 rounded-lg"
+                                                style={{ backgroundColor: color.code }}
+                                            />
+                                            <div className="mt-2 text-xs font-medium text-gray-700">{color.name}</div>
+                                            {selectedColor === color.code && (
+                                                <div className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center">
+                                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </div>
                                             )}
@@ -329,149 +220,191 @@ function ShowProduct() {
                                 </div>
                             </div>
 
-                            {/* Quantity Selection */}
-                            <div className="mb-8">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center border border-gray-300 rounded-xl">
+                            {/* Size Selection in Inches */}
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Size (Inches)</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {product.sizes.map((size) => (
                                         <button
-                                            onClick={() => setQuantity(Math.max(100, quantity - 100))}
-                                            className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                            key={size.name}
+                                            onClick={() => setSelectedSize(size.name)}
+                                            className={`p-4 rounded-xl border-2 transition-all ${selectedSize === size.name
+                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
                                         >
-                                            -
+                                            <div className="font-semibold text-lg mb-1">{size.name}</div>
+                                            <div className="text-sm text-gray-500">{size.dimensions}</div>
                                         </button>
-                                        <div className="px-6 py-3 text-lg font-semibold">{quantity}</div>
-                                        <button
-                                            onClick={() => setQuantity(quantity + 100)}
-                                            className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                    <div className="text-gray-600">
-                                        Total: <span className="text-2xl font-bold text-gray-900">₹{totalPrice.toLocaleString()}</span>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                                <button
-                                    onClick={handleAddToCart}
-                                    className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Add to Cart (Wholesale)
-                                </button>
-                                <button
-                                    onClick={handleQuickOrder}
-                                    className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Quick Order
-                                </button>
-                                <button className="px-6 py-4 border-2 border-gray-300 text-gray-700 font-bold rounded-xl hover:border-amber-300 hover:bg-amber-50 transition-all">
-                                    Request Quote
-                                </button>
-                            </div>
-
-                            {/* Wholesale Price Table */}
-                            <div className="mb-8">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Wholesale Pricing</h3>
-                                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                                    <table className="w-full">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="py-3 px-4 text-left">Quantity</th>
-                                                <th className="py-3 px-4 text-left">Price per piece</th>
-                                                <th className="py-3 px-4 text-left">Total Price</th>
-                                                <th className="py-3 px-4 text-left">You Save</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {product.wholesalePacks.map((pack, index) => (
-                                                <tr key={index} className={`border-t border-gray-200 ${quantity >= pack.pieces ? 'bg-amber-50' : ''}`}>
-                                                    <td className="py-3 px-4 font-medium">{pack.pieces.toLocaleString()} pcs</td>
-                                                    <td className="py-3 px-4">₹{(pack.price / pack.pieces).toFixed(0)}</td>
-                                                    <td className="py-3 px-4">₹{pack.price.toLocaleString()}</td>
-                                                    <td className="py-3 px-4 text-green-600 font-bold">{pack.save}%</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Specifications Section */}
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Specifications</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {Object.entries(product.specifications).map(([key, value]) => (
-                                key !== 'certifications' && (
-                                    <div key={key} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                                        <h4 className="text-sm text-gray-500 mb-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</h4>
-                                        <p className="font-semibold text-gray-900">{value}</p>
-                                    </div>
-                                )
-                            ))}
-                        </div>
-
-                        {/* Certifications */}
-                        <div className="mt-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h4 className="text-sm text-gray-500 mb-4">Certifications & Standards</h4>
-                            <div className="flex flex-wrap gap-3">
-                                {product.specifications.certifications.map((cert, index) => (
-                                    <span key={index} className="px-4 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                                        {cert}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Related Products */}
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {product.relatedProducts.map((item) => (
-                                <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                                    <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-lg font-bold text-gray-900">₹{item.price}</span>
-                                            <button className="px-4 py-2 bg-amber-50 text-amber-700 font-medium rounded-lg hover:bg-amber-100">
-                                                Add to Cart
+                            {/* Quantity & Actions */}
+                            <div className="space-y-6">
+                                {/* Quantity */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
+                                            <button
+                                                onClick={() => setQuantity(Math.max(100, quantity - 100))}
+                                                className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                                </svg>
+                                            </button>
+                                            <div className="px-6 py-3 text-lg font-semibold text-gray-900">
+                                                {quantity.toLocaleString()} <span className="text-sm text-gray-500">pieces</span>
+                                            </div>
+                                            <button
+                                                onClick={() => setQuantity(quantity + 100)}
+                                                className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+
+                                {/* Action Buttons */}
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <button className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <FaShoppingCart className="relative z-10 w-5 h-5" />
+                                        <span className="relative z-10">Add to Cart</span>
+                                    </button>
+
+                                    <button className="group relative bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-6 rounded-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <FaWhatsapp className="relative z-10 w-5 h-5" />
+                                        <span className="relative z-10">WhatsApp Order</span>
+                                    </button>
+                                </div>
+
+                                {/* Quick Actions */}
+                                <div className="flex flex-wrap gap-3">
+                                    <button className="flex-1 min-w-[120px] py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
+                                        <FaPhoneAlt className="w-4 h-4" />
+                                        Call Now
+                                    </button>
+                                    <button className="flex-1 min-w-[120px] py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-rose-300 hover:bg-rose-50 transition-all flex items-center justify-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                        Request Quote
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Bulk Order CTA */}
-                    <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-8 text-white text-center">
-                        <h2 className="text-3xl font-bold mb-4">Ready to Place a Bulk Order?</h2>
-                        <p className="text-amber-100 mb-6 max-w-2xl mx-auto">
-                            Contact our wholesale team for custom orders, private labeling, and special pricing for large quantities.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button className="px-8 py-3 bg-white text-amber-600 font-bold rounded-xl hover:bg-amber-50">
-                                Request Custom Quote
-                            </button>
-                            <button className="px-8 py-3 border-2 border-white text-white font-bold rounded-xl hover:bg-white/10">
-                                Call Now: +91 9876543210
-                            </button>
+                    {/* Specifications & Details */}
+                    <div className="mt-12 space-y-8">
+                        {/* Specifications Grid */}
+                        <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Specifications</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                {product.specifications.map((spec, index) => (
+                                    <div key={index} className="text-center p-4 bg-white rounded-xl border border-gray-100">
+                                        <div className="text-sm text-gray-500 mb-2">{spec.label}</div>
+                                        <div className="font-semibold text-gray-900">{spec.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Reviews Highlights */}
+                        <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
+                            <div className="flex flex-col md:flex-row items-center gap-8">
+                                <div className="text-center">
+                                    <div className="text-5xl font-bold text-gray-900 mb-2">{product.reviews.rating}</div>
+                                    <div className="flex justify-center mb-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <FaStar key={i} className={`w-5 h-5 ${i < Math.floor(product.reviews.rating)
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                                }`} />
+                                        ))}
+                                    </div>
+                                    <div className="text-gray-600">{product.reviews.count} reviews</div>
+                                </div>
+
+                                <div className="flex-1 space-y-3">
+                                    {product.reviews.highlights.map((highlight, index) => (
+                                        <div key={index} className="flex items-center gap-4">
+                                            <div className="w-24 text-sm text-gray-600">{highlight.label}</div>
+                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                                                    style={{ width: `${(highlight.value / 5) * 100}%` }}
+                                                />
+                                            </div>
+                                            <div className="w-10 text-right font-semibold text-gray-900">
+                                                {highlight.value}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bulk Order CTA */}
+                        <div className="relative overflow-hidden rounded-3xl">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700" />
+                            <div className="relative z-10 p-8 md:p-12 text-white">
+                                <div className="grid md:grid-cols-2 gap-8 items-center">
+                                    <div>
+                                        <h2 className="text-3xl font-bold mb-4">Need Custom Bulk Order?</h2>
+                                        <p className="text-blue-100 mb-6">
+                                            Contact us for custom designs, private labeling, and special pricing for large quantities. Our team is ready to assist you.
+                                        </p>
+                                        <div className="flex flex-wrap gap-3">
+                                            <button className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all">
+                                                Request Custom Quote
+                                            </button>
+                                            <button className="px-6 py-3 border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-all">
+                                                Download Catalog
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <div className="text-2xl font-bold mb-1">5000+</div>
+                                            <div className="text-blue-200 text-sm">Happy Clients</div>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <div className="text-2xl font-bold mb-1">50K+</div>
+                                            <div className="text-blue-200 text-sm">Orders Delivered</div>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <div className="text-2xl font-bold mb-1">24/7</div>
+                                            <div className="text-blue-200 text-sm">Support</div>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <div className="text-2xl font-bold mb-1">15+</div>
+                                            <div className="text-blue-200 text-sm">Years Experience</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Footer */}
+                <footer className="mt-12 pt-8 border-t border-gray-200">
+                    <div className="container mx-auto px-4 pb-6">
+                        <div className="text-center text-gray-600">
+                            <p className="font-medium">PaperDecor Wholesale</p>
+                            <p className="text-sm mt-1">Premium Paper Decorations Since 2008</p>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </ScrollReveal>
     )

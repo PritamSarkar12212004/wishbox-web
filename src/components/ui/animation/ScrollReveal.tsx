@@ -10,13 +10,13 @@ interface ScrollRevealProps {
 const ScrollReveal = ({ children, delay = 0, duration = 0.8 }: ScrollRevealProps) => {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{
-                duration: duration,
-                delay: delay,
-                ease: [0.16, 1, 0.3, 1]
+                duration,
+                delay,
+                ease: "easeOut"
             }}
         >
             {children}
