@@ -4,16 +4,43 @@ import MainProductOne from '../../components/main/products/MainProductOne';
 import FullScreenPoster from '../../components/main/banners/FullScreenPoster';
 import MainTopSellingProducts from '../../components/main/products/MainTopSellingProducts';
 import ScrollReveal from '../../components/ui/animation/ScrollReveal';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ApiCallFetchDashBoard from '../../api/dashboard/ApiCallFetchDashBoard';
+import ApiCallFetchIdCart from '../../api/cart/ApiCallFetchIdCart';
 
 function DashboardPage() {
+    const userId = useSelector((state: any) => state.userDataSlice.mainUserID)
     const navigate = useNavigate();
+    const dispatch = useDispatch()
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await Promise.all([
+                    ApiCallFetchIdCart({
+                        dispatch,
+                        userId,
+                    }),
+                    ApiCallFetchDashBoard({
+                        dispatch,
+                    }),
+                ]);
+            } catch (error) {
+                console.error("Fetch Error:", error);
+            }
+        };
+
+        if (userId) {
+            fetchData();
+        }
+    }, [userId]);
     return (
         <ScrollReveal>
             <div className='flex-1 flex gap-8 flex-col pb-20'>
                 <DashHeroOne navigation={navigate} />
                 <MainProductOne navigate={navigate} />
                 <FullScreenPoster />
-                <MainTopSellingProducts />
+                <MainTopSellingProducts navigation={navigate} />
             </div>
         </ScrollReveal>
     )

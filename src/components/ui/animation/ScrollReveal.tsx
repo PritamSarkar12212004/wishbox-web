@@ -11,8 +11,7 @@ const ScrollReveal = ({ children, delay = 0, duration = 0.8 }: ScrollRevealProps
     return (
         <motion.div
             initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
                 duration,
                 delay,
