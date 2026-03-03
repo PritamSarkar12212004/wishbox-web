@@ -1,80 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ScrollReveal from '../../components/ui/animation/ScrollReveal';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import APiCallFetchFullCart from '../../api/cart/APiCallFetchFullCart';
 
 function CartPage() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Premium Paper Garland - Festival Special",
-      price: 1299,
-      originalPrice: 1899,
-      quantity: 2,
-      image: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-      category: "Party Garlands",
-      color: "Multi-color",
-      delivery: "Free Delivery",
-      estimatedDelivery: "2-3 business days"
-    },
-    {
-      id: 2,
-      name: "Elegant Paper Flower Bouquet",
-      price: 899,
-      originalPrice: 1299,
-      quantity: 1,
-      image: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-      category: "Paper Flowers",
-      color: "Pink & White",
-      delivery: "Express Shipping",
-      estimatedDelivery: "1-2 business days"
-    },
-    {
-      id: 3,
-      name: "Diwali Lantern Set of 12",
-      price: 2499,
-      originalPrice: 3499,
-      quantity: 1,
-      image: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-      category: "Festive Lanterns",
-      color: "Gold & Red",
-      delivery: "Free Delivery",
-      estimatedDelivery: "3-4 business days"
-    },
-    {
-      id: 4,
-      name: "Wedding Backdrop - Luxury Design",
-      price: 4599,
-      originalPrice: 5999,
-      quantity: 1,
-      image: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-      category: "Wedding Backdrops",
-      color: "Ivory White",
-      delivery: "Standard Shipping",
-      estimatedDelivery: "4-5 business days"
-    }
-  ]);
-
+  const data: {
+    image: string;
+    price: number;
+    quantity: number;
+    subTotal: number;
+    title: string
+  } = useSelector((state: any) => state.cartDataSlice.cartData)
+  const id = useSelector((state: any) => state.userDataSlice.mainUserID)
+  type CartItem = {
+    _id: any;
+    image: string;
+    price: number;
+    quantity: number;
+    title: string;
+  };
+  const [cartItems, setCartItems] = useState<CartItem[]>(data || []);
   const navigate = useNavigate();
+  const updateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity < 20) return;
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
     setCartItems(items =>
       items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
+        item._id === id
+          ? { ...item, quantity: newQuantity }
+          : item
       )
     );
   };
-
   const removeItem = (id: number) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+    setCartItems(items => items.filter(item => item._id !== id));
   };
-
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const savings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0);
   const shipping = subtotal > 3000 ? 0 : 99;
-  const tax = subtotal * 0.18; // 18% GST
-  const total = subtotal + shipping + tax;
+  const total = subtotal;
 
+  const dispatch = useDispatch()
+  useEffect(() => {
+    APiCallFetchFullCart({
+      dispatch: dispatch,
+      id: id
+    })
+  }, [])
   return (
     <ScrollReveal>
       <div className="min-h-screen bg-gray-50">
@@ -137,7 +109,7 @@ function CartPage() {
                 ) : (
                   <div className="divide-y divide-gray-100">
                     {cartItems.map((item) => (
-                      <div key={item.id} className="p-3 sm:p-4 hover:bg-gray-50/50 transition-colors duration-200">
+                      <div key={item._id} className="p-3 sm:p-4 hover:bg-gray-50/50 transition-colors duration-200">
                         <div className="flex gap-3 sm:gap-4">
                           {/* Product Image - Fixed aspect ratio */}
                           <div className="flex-shrink-0">
@@ -145,7 +117,7 @@ function CartPage() {
                               <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-gray-100">
                                 <img
                                   src={item.image}
-                                  alt={item.name}
+                                  alt={item.title}
                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 />
                               </div>
@@ -161,11 +133,11 @@ function CartPage() {
                               {/* Top row: Title and Remove button */}
                               <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
                                 <div className="flex-1 min-w-0">
-                                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-1">{item.name}</h3>
-                                  <p className="text-xs text-gray-600 mb-1">Category: {item.category}</p>
+                                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-1">{item.title}</h3>
+                                  {/* <p className="text-xs text-gray-600 mb-1">Category: {item.category}</p> */}
                                 </div>
                                 <button
-                                  onClick={() => removeItem(item.id)}
+                                  onClick={() => removeItem(item._id)}
                                   className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +147,7 @@ function CartPage() {
                               </div>
 
                               {/* Middle row: Color and Delivery info */}
-                              <div className="flex items-center gap-3 mb-2 sm:mb-3">
+                              {/* <div className="flex items-center gap-3 mb-2 sm:mb-3">
                                 <span className="flex items-center gap-1 text-xs text-gray-500">
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -188,14 +160,14 @@ function CartPage() {
                                   </svg>
                                   {item.delivery}
                                 </span>
-                              </div>
+                              </div> */}
 
                               {/* Bottom row: Quantity, Delivery estimate, and Price */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
                                 <div className="flex items-center gap-3">
                                   <div className="flex items-center bg-gray-100 rounded-full">
                                     <button
-                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      onClick={() => updateQuantity(item._id, item.quantity - 20)}
                                       className="p-1.5 text-gray-600 hover:text-amber-600"
                                     >
                                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +176,7 @@ function CartPage() {
                                     </button>
                                     <span className="w-8 text-center font-medium text-gray-900 text-sm">{item.quantity}</span>
                                     <button
-                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                      onClick={() => updateQuantity(item._id, item.quantity + 20)}
                                       className="p-1.5 text-gray-600 hover:text-amber-600"
                                     >
                                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,17 +184,15 @@ function CartPage() {
                                       </svg>
                                     </button>
                                   </div>
-                                  <span className="text-xs text-gray-500 hidden sm:inline">Est: {item.estimatedDelivery}</span>
                                 </div>
 
                                 <div className="flex items-center justify-between sm:justify-end gap-3">
-                                  <span className="text-xs text-gray-500 sm:hidden">Est: {item.estimatedDelivery}</span>
                                   <div className="text-right">
                                     <div className="text-base sm:text-lg font-bold text-gray-900">₹{item.price * item.quantity}</div>
                                     <div className="flex items-center gap-1 text-xs">
-                                      <span className="text-gray-400 line-through">₹{item.originalPrice * item.quantity}</span>
+                                      <span className="text-gray-400 line-through">₹{item.price * item.quantity}</span>
                                       <span className="text-green-600 font-medium">
-                                        Save ₹{(item.originalPrice - item.price) * item.quantity}
+                                        Save ₹{(item.price - item.price) * item.quantity}
                                       </span>
                                     </div>
                                   </div>
@@ -257,7 +227,7 @@ function CartPage() {
                 )}
               </div>
             </div>
-            
+
             {/* Order Summary Section */}
             <div className="lg:col-span-1">
               <div className="sticky top-2 sm:top-4">
@@ -273,12 +243,6 @@ function CartPage() {
                         <span className="text-sm text-gray-600">Subtotal ({cartItems.length} items)</span>
                         <span className="font-medium text-gray-900">₹{subtotal}</span>
                       </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Savings</span>
-                        <span className="font-medium text-green-600">-₹{savings}</span>
-                      </div>
-
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Shipping</span>
                         <span className="font-medium text-gray-900">
@@ -289,12 +253,6 @@ function CartPage() {
                           )}
                         </span>
                       </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Tax (GST 18%)</span>
-                        <span className="font-medium text-gray-900">₹{tax.toFixed(2)}</span>
-                      </div>
-
                       {shipping > 0 && (
                         <div className="mt-2 p-2 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg">
                           <div className="flex items-center gap-2">
@@ -337,44 +295,6 @@ function CartPage() {
                     >
                       {cartItems.length === 0 ? 'Cart is Empty' : 'Proceed to Checkout'}
                     </button>
-
-                    {/* Payment Methods */}
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 mb-2">We accept</p>
-                      <div className="flex items-center gap-2">
-                        {['Visa', 'Mastercard', 'UPI', 'NetBanking'].map((method, index) => (
-                          <div key={index} className="w-7 h-5 sm:w-8 sm:h-6 bg-gray-100 rounded border flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">{method.charAt(0)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Secure Checkout */}
-                    <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <svg className="w-4 h-4 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <div className="flex-1">
-                          <p className="text-xs font-medium text-green-800">Secure Checkout</p>
-                          <p className="text-xs text-green-700">Your payment information is encrypted and secure</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Return Policy */}
-                    <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <svg className="w-4 h-4 text-gray-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <div className="flex-1">
-                          <p className="text-xs font-medium text-gray-800">30-Day Return Policy</p>
-                          <p className="text-xs text-gray-600">Hassle-free returns within 30 days of delivery</p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

@@ -11,6 +11,7 @@ const apiPath = {
   CART: {
     ADD_TO_CART: "/product/product_add_cart",
     FETCH_ID_CART: "/product/product_fetch_id_cart",
+    FETCH_FULL_CART: "/product/product_fetch_full_cart",
   },
   AUTH: {
     CALL_OTP: "/auth/call_otp",
