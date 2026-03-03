@@ -3,7 +3,10 @@ import ScrollReveal from '../../components/ui/animation/ScrollReveal';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import APiCallFetchFullCart from '../../api/cart/APiCallFetchFullCart';
-
+import { mainLoaderTogel } from '../../services/store/slice/loading/loadingSlice';
+import ApiCallRemoveSingleItem from '../../api/cart/ApiCallRemoveSingleItem';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 function CartPage() {
   const data: {
     image: string;
@@ -12,7 +15,7 @@ function CartPage() {
     subTotal: number;
     title: string
   } = useSelector((state: any) => state.cartDataSlice.cartData)
-  const id = useSelector((state: any) => state.userDataSlice.mainUserID)
+  const userID = useSelector((state: any) => state.userDataSlice.mainUserID)
   type CartItem = {
     _id: any;
     image: string;
@@ -20,11 +23,14 @@ function CartPage() {
     quantity: number;
     title: string;
   };
-  const [cartItems, setCartItems] = useState<CartItem[]>(data || []);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const navigateCeckout = () => {
+    dispatch(mainLoaderTogel(true))
+  }
+  const [removeLoading, setRemoveLoading] = useState<boolean>(false)
   const navigate = useNavigate();
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 20) return;
-
     setCartItems(items =>
       items.map(item =>
         item._id === id
@@ -33,8 +39,25 @@ function CartPage() {
       )
     );
   };
-  const removeItem = (id: number) => {
-    setCartItems(items => items.filter(item => item._id !== id));
+  const removeFun = (id: any) => {
+    setCartItems(items =>
+      items.filter(item => item._id !== id)
+    );
+  }
+  const removeItem = async (id: string) => {
+    setRemoveLoading(true)
+    const data = {
+      item: id,
+      userId: userID
+    };
+    ApiCallRemoveSingleItem({
+      data: data,
+      dispatch: dispatch,
+      removeFun: removeFun,
+      setRemoveLoading
+    })
+
+
   };
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 3000 ? 0 : 99;
@@ -44,9 +67,12 @@ function CartPage() {
   useEffect(() => {
     APiCallFetchFullCart({
       dispatch: dispatch,
-      id: id
+      id: userID
     })
   }, [])
+  useEffect(() => {
+    setCartItems(data || []);
+  }, [data]);
   return (
     <ScrollReveal>
       <div className="min-h-screen bg-gray-50">
@@ -140,9 +166,14 @@ function CartPage() {
                                   onClick={() => removeItem(item._id)}
                                   className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
+                                  {
+                                    removeLoading ? <Box sx={{ display: 'flex' }}>
+                                      <CircularProgress size={15} color='info' />
+                                    </Box>
+                                      : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                      </svg>
+                                  }
                                 </button>
                               </div>
 
@@ -286,9 +317,10 @@ function CartPage() {
 
                     {/* Checkout Button */}
                     <button
-                      onClick={() => navigate('/checkout')}
+                      // onClick={() => navigate('/checkout')}
+                      onClick={() => navigateCeckout()}
                       disabled={cartItems.length === 0}
-                      className={`w-full py-3 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 ${cartItems.length === 0
+                      className={`w-full py-3 rounded-lg cursor-pointer font-bold text-sm sm:text-base transition-all duration-200 ${cartItems.length === 0
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg'
                         }`}
