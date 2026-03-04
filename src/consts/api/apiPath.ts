@@ -14,6 +14,10 @@ const apiPath = {
     FETCH_FULL_CART: "/product/product_fetch_full_cart",
     REMOVE_SINGLE_ITEM_CART: "/product/product_remove_single_cart",
   },
+  WATCHLIST: {
+    ADD_WATCHLIST: "/product/product_add_watch_list",
+    FETCH_WATCHLIST: "/product/product_fetch_watch_list",
+  },
   AUTH: {
     CALL_OTP: "/auth/call_otp",
   },

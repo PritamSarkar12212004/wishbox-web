@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import ScrollReveal from '../../../components/ui/animation/ScrollReveal'
-import { FaStar, FaHeart, FaShare, FaShoppingCart, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa'
+import { FaStar, FaHeart, FaShoppingCart, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux';
 import { mainLoaderTogel } from '../../../services/store/slice/loading/loadingSlice';
 import ApiCallProductImageFetch from '../../../api/product/ApiCallProductImageFetch';
@@ -10,17 +10,20 @@ import ApiCallCart from '../../../api/cart/ApiCallCart';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Box } from '@mui/material';
 import routePath from '../../../consts/routes/routePath';
+import ApiCallWatchList from '../../../api/watchlist/ApiCallWatchList';
 
 function ShowProduct() {
     const [loadingCart, setLoadingCart] = useState<boolean>(false)
     const [quantity, setQuantity] = useState(20);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const [isFavorite, setIsFavorite] = useState(false);
+    const userId = useSelector((state: any) => state.userDataSlice.mainUserID)
     const item = useSelector((state: any) => state.productTempData.productShowData);
+    const cartData = useSelector((state: any) => state.cartDataSlice.cartIDData);
+    const watchListData = useSelector((state: any) => state.watchlistSlice.idWatchListData)
+    const isInWatchlist = watchListData?.includes(item?.item?._id);
     const location: any = useLocation();
     const { navigateData } = location.state;
     const dispatch = useDispatch();
-    const userId = useSelector((state: any) => state.userDataSlice.mainUserID)
     const callApi = async () => {
         dispatch(mainLoaderTogel(true));
         const image = await ApiCallProductImageFetch({ gItem: navigateData.gallery, dispatch });
@@ -38,7 +41,6 @@ function ShowProduct() {
         );
     }
     const product = item.item;
-    const cartData = useSelector((state: any) => state.cartDataSlice.cartIDData);
     const isInCart = cartData?.includes(product._id);
     const salePrice = product.pricing?.salePrice || 0;
     const originalPrice = product.pricing?.originalPrice || 0;
@@ -76,6 +78,17 @@ function ShowProduct() {
             setLoadingCart
         })
     }
+    const LikeProduct = async (id: any) => {
+        const data = {
+            id: id,
+            userID: userId
+
+        }
+        await ApiCallWatchList({
+            dispatch: dispatch,
+            data: data
+        })
+    }
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "instant" });
         callApi();
@@ -89,14 +102,11 @@ function ShowProduct() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4"></div>
                             <div className="flex items-center gap-4">
-                                <button className="p-2 hover:bg-gray-100 rounded-full">
-                                    <FaShare className="w-5 h-5 text-gray-600" />
-                                </button>
                                 <button
-                                    onClick={() => setIsFavorite(!isFavorite)}
+                                    onClick={() => LikeProduct(product._id)}
                                     className="p-2 hover:bg-gray-100 rounded-full"
                                 >
-                                    <FaHeart className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-gray-600'}`} />
+                                    <FaHeart className={`w-5 h-5 ${isInWatchlist ? 'text-red-500' : 'text-gray-600'}`} />
                                 </button>
                             </div>
                         </div>
@@ -365,8 +375,8 @@ function ShowProduct() {
                         </div>
                     </div>
                 </footer>
-            </div>
-        </ScrollReveal>
+            </div >
+        </ScrollReveal >
     );
 }
 

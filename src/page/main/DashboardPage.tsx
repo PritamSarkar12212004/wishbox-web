@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ApiCallFetchDashBoard from '../../api/dashboard/ApiCallFetchDashBoard';
 import ApiCallFetchIdCart from '../../api/cart/ApiCallFetchIdCart';
+import ApiCallFetchWatchList from '../../api/watchlist/ApiCallFetchWatchList';
 
 function DashboardPage() {
     const userId = useSelector((state: any) => state.userDataSlice.mainUserID)
@@ -17,12 +18,16 @@ function DashboardPage() {
         const fetchData = async () => {
             try {
                 await Promise.all([
+                    ApiCallFetchDashBoard({
+                        dispatch,
+                    }),
+                    ApiCallFetchWatchList({
+                        data: userId,
+                        dispatch: dispatch
+                    }),
                     ApiCallFetchIdCart({
                         dispatch,
                         userId,
-                    }),
-                    ApiCallFetchDashBoard({
-                        dispatch,
                     }),
                 ]);
             } catch (error) {
