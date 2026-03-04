@@ -5,8 +5,8 @@ import LottieAnimation from "../../ui/animation/LootiAnimation";
 import AnimationCon from "../../../consts/animations/AnimationCon";
 import { useDispatch, useSelector } from "react-redux";
 import MainHeader from "../main/header/MainHeader";
-import { useLocation } from "react-router-dom";
-import routePath from "../../../consts/routes/routePath";
+// import { useLocation } from "react-router-dom";
+// import routePath from "../../../consts/routes/routePath";
 import { useEffect, useState } from "react";
 import checkLogin from "../../../functions/auth/checkLogin";
 import LoginPage from "../../../page/auth/LoginPage";
@@ -16,17 +16,16 @@ import { userMainpDataSet } from "../../../services/store/slice/user/userDataSli
 
 function RootWraper({ children }: any) {
     const loading = useSelector((state: any) => state.loader.mainLoader);
-    const location = useLocation().pathname;
-    const privateRoutes = [
-        routePath.PRIVATE_ROUTE.DASHBOARD_PAGE,
-        routePath.PRIVATE_ROUTE.SHOP_PAGE,
-        routePath.PRIVATE_ROUTE.ABOUT_PAGE,
-        routePath.PRIVATE_ROUTE.SUPPORT_PAGE,
-        routePath.PRIVATE_ROUTE.WISHLIST_PAGE,
-        routePath.PRIVATE_ROUTE.CART_PAGE,
-        routePath.PRIVATE_ROUTE.PROFILE_PAGE
-    ];
-    const shouldShowHeader = privateRoutes.includes(location);
+    // const location = useLocation().pathname;
+    // const privateRoutes = [
+    //     routePath.PRIVATE_ROUTE.DASHBOARD_PAGE,
+    //     routePath.PRIVATE_ROUTE.SHOP_PAGE,
+    //     routePath.PRIVATE_ROUTE.ABOUT_PAGE,
+    //     routePath.PRIVATE_ROUTE.SUPPORT_PAGE,
+    //     routePath.PRIVATE_ROUTE.WISHLIST_PAGE,
+    //     routePath.PRIVATE_ROUTE.CART_PAGE,
+    //     routePath.PRIVATE_ROUTE.PROFILE_PAGE
+    // ];
     const [isAuth, setIsAuth] = useState<boolean | null>(null);
     const dispatch = useDispatch()
     useEffect(() => {
@@ -134,7 +133,7 @@ function RootWraper({ children }: any) {
                 </Modal>
             )}
             <div className="flex-1 px-3 sm:px-4 md:px-6 pt-3 md:pt-4 relative">
-                {shouldShowHeader && <MainHeader />}
+                {<MainHeader />}
                 <div className="mt-2 md:mt-0">
                     {children}
                 </div>

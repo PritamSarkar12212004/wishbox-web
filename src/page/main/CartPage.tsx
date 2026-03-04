@@ -102,17 +102,6 @@ function CartPage() {
                 <div className="p-3 sm:p-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h2 className="text-base sm:text-lg font-bold text-gray-900">Your Cart Items</h2>
-                    {cartItems.length > 0 && (
-                      <button
-                        onClick={() => setCartItems([])}
-                        className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Clear Cart
-                      </button>
-                    )}
                   </div>
                 </div>
 
@@ -164,7 +153,7 @@ function CartPage() {
                                 </div>
                                 <button
                                   onClick={() => removeItem(item._id)}
-                                  className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+                                  className="p-1 text-gray-400 cursor-pointer hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0"
                                 >
                                   {
                                     removeLoading ? <Box sx={{ display: 'flex' }}>
