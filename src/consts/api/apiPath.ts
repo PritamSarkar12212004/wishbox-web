@@ -17,6 +17,7 @@ const apiPath = {
   WATCHLIST: {
     ADD_WATCHLIST: "/product/product_add_watch_list",
     FETCH_WATCHLIST: "/product/product_fetch_watch_list",
+    FETCH_WATCHLIST_FULL_DATA: "/product/product_fetch_full_watch_list",
   },
   AUTH: {
     CALL_OTP: "/auth/call_otp",

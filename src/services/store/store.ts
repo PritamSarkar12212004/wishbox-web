@@ -13,6 +13,7 @@ import tempProductSlice from "./slice/product/tempProductSlice";
 import userDataSlice from "./slice/user/userDataSlice";
 import cartDataSlice from "./slice/cart/cartDataSlice";
 import watchListProductSlice from "./slice/watchlist/watchListProductSlice";
+import watchListMainProductSlice from "./slice/watchlist/watchListMainProductSlice";
 
 const rootReducer: any = combineReducers({
   auth: authReducer,
@@ -24,13 +25,13 @@ const rootReducer: any = combineReducers({
   userDataSlice: userDataSlice,
   cartDataSlice: cartDataSlice,
   watchlistSlice: watchListProductSlice,
+  watchlistMainSlice: watchListMainProductSlice,
 });
 
 const persistConfig = {
   key: key.REDUX_KEY.STORE_KEY,
   storage,
   whitelist: ["productTempData", "auth", "cartDataSlice", "watchlistSlice"],
-
   transforms: [
     encryptTransform({
       secretKey: key.REDUX_KEY.REDUX_ENCRYPTION_KEY,
