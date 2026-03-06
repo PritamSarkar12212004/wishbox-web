@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import routePath from "../../../consts/routes/routePath";
 import ScrollReveal from "../../../components/ui/animation/ScrollReveal";
 
@@ -223,7 +222,6 @@ function ShowListPoduct() {
     },
   ];
 
-  const navigation = useNavigate()
   return (
     <ScrollReveal>
       <div className='w-full flex flex-col gap-8 py-12 px-4 md:px-8'>

@@ -1,83 +1,25 @@
+import { useLocation, useNavigate } from 'react-router-dom';
 import ScrollReveal from '../../components/ui/animation/ScrollReveal';
+import MainTopSellingProductCard from '../../components/card/MainTopSellingProductCard';
+import { useDispatch } from 'react-redux';
 
 function CollectionListPage() {
-    const collections = [
-        {
-            id: 1,
-            title: "Party Garlands",
-            subtitle: "Premium Handmade Decor",
-            bgColor: "#FFE8F0",
-            bgColor2: "#FF6B9D",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 2,
-            title: "Paper Flowers",
-            subtitle: "Elegant Floral Creations",
-            bgColor: "#F0F7FF",
-            bgColor2: "#4A90E2",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 3,
-            title: "Birthday Decor",
-            subtitle: "Colorful Celebration Sets",
-            bgColor: "#F0FFF4",
-            bgColor2: "#48BB78",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 4,
-            title: "Wedding Backdrops",
-            subtitle: "Luxury Paper Designs",
-            bgColor: "#FFF7E6",
-            bgColor2: "#ED8936",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/8/537264055/KO/LP/HB/151524151/ganpati-decoration-paper-fans-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 5,
-            title: "Festive Lanterns",
-            subtitle: "Traditional & Modern Designs",
-            bgColor: "#E6F7FF",
-            bgColor2: "#4299E1",
-            img: "https://5.imimg.com/data5/ANDROID/Default/2022/6/YU/UB/KR/151524151/product-jpeg-500x500.jpg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 6,
-            title: "Decorative Fans",
-            subtitle: "Wall & Ceiling Decor",
-            bgColor: "#F9F0FF",
-            bgColor2: "#9F7AEA",
-            img: "https://5.imimg.com/data5/IOS/Default/2025/9/541891653/JT/OP/BL/151524151/product-jpeg-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 7,
-            title: "Paper Streamers",
-            subtitle: "Vibrant Party Decorations",
-            bgColor: "#FFF0F3",
-            bgColor2: "#FC8181",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        },
-        {
-            id: 8,
-            title: "Celebration Banners",
-            subtitle: "Custom Text & Designs",
-            bgColor: "#F0FFF8",
-            bgColor2: "#38B2AC",
-            img: "https://5.imimg.com/data5/SELLER/Default/2025/6/523216395/QU/RE/VZ/151524151/aakash-kandil-diwali-lanterns-500x500.jpeg",
-            img2: "https://5.imimg.com/data5/SELLER/Default/2025/6/523107255/SJ/BD/BQ/151524151/paper-party-garland-500x500.jpeg"
-        }
+    const navigation = useNavigate()
+    const location: any = useLocation();
+    const { data } = location.state || {};
+    const dispatch = useDispatch()
+    const colorPalette = [
+        { border: "#E6B8C7", bg: "#FFEFF4", accent: "#D97A9A" },
+        { border: "#BFDFFF", bg: "#EEF7FF", accent: "#5DADE2" },
+        { border: "#BEE5D3", bg: "#ECFFF6", accent: "#52BE80" },
+        { border: "#FFE0B3", bg: "#FFF6E8", accent: "#F5B041" },
+        { border: "#D7C4F2", bg: "#F4EEFF", accent: "#A569BD" },
+        { border: "#BFEDE6", bg: "#EFFFFB", accent: "#48C9B0" },
+        { border: "#F5C6C6", bg: "#FFF1F1", accent: "#EC7063" },
+        { border: "#D6DBDF", bg: "#F4F6F7", accent: "#7F8C8D" },
     ];
     return (
         <ScrollReveal>
-
             <div className='w-full flex flex-col gap-8 py-12 px-4 md:px-8'>
                 <div className="w-full flex flex-col items-center justify-center gap-4">
                     <div className="flex items-center gap-3">
@@ -94,18 +36,15 @@ function CollectionListPage() {
                 </div>
 
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {collections.map((item) => (
-                        <div key={item.id} className="group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style={{ backgroundColor: item.bgColor, border: `1px solid ${item.bgColor2}` }}>
-                            <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: item.bgColor2 }} />
-                            <div className="relative h-40 sm:h-44 md:h-48 lg:h-52 overflow-hidden rounded-t-2xl bg-white">
-                                <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
-                                <img src={item.img2} alt={item.title} className="absolute top-0 left-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                            </div>
-                            <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
-                                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 line-clamp-1">{item.title}</h3>
-                                <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">{item.subtitle}</p>
-                            </div>
-                        </div>
+                    {data.map((item: any, index: any) => (
+                        <MainTopSellingProductCard
+                            key={item._id + '-' + index}
+                            item={item}
+                            navigation={navigation}
+                            colors={colorPalette[index % colorPalette.length]}
+                            dispatch={dispatch}
+                            isImg={false}
+                        />
                     ))}
                 </div>
             </div>
