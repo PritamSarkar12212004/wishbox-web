@@ -1,4 +1,3 @@
-import MainTopSellingProductCard from '../../components/card/MainTopSellingProductCard';
 import ScrollReveal from '../../components/ui/animation/ScrollReveal';
 
 function CollectionListPage() {
@@ -95,8 +94,18 @@ function CollectionListPage() {
                 </div>
 
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {collections.map((item, index) => (
-                        <MainTopSellingProductCard item={item} index={index} navigation={navigation} />
+                    {collections.map((item) => (
+                        <div key={item.id} className="group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style={{ backgroundColor: item.bgColor, border: `1px solid ${item.bgColor2}` }}>
+                            <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: item.bgColor2 }} />
+                            <div className="relative h-40 sm:h-44 md:h-48 lg:h-52 overflow-hidden rounded-t-2xl bg-white">
+                                <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
+                                <img src={item.img2} alt={item.title} className="absolute top-0 left-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                            </div>
+                            <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
+                                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 line-clamp-1">{item.title}</h3>
+                                <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">{item.subtitle}</p>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

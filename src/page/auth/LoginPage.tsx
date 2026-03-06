@@ -99,7 +99,7 @@ const LoginPage = () => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const [step, setStep] = useState<'phone' | 'otp'>('phone');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, _setPhoneNumber] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -277,7 +277,7 @@ const LoginPage = () => {
 
                 {/* Features Grid - Fixed with stable rendering */}
                 <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -298,7 +298,7 @@ const LoginPage = () => {
                         </Box>
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -319,7 +319,7 @@ const LoginPage = () => {
                         </Box>
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',

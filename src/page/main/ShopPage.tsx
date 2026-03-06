@@ -140,10 +140,10 @@ function ShopPage() {
                                                 {popularTags.map((tag, idx) => (
                                                     <button
                                                         key={idx}
-                                                        onClick={() => handleSuggestionClick(tag)}
+                                                        onClick={() => handleSuggestionClick(tag as string)}
                                                         className="px-3 py-1.5 bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-700 rounded-full text-sm font-medium transition-colors border border-gray-200 hover:border-amber-200"
                                                     >
-                                                        {tag}
+                                                        {tag as string}
                                                     </button>
                                                 ))}
                                             </div>
@@ -201,7 +201,6 @@ function ShopPage() {
                                     key={item._id}
                                     colors={colorPalette[index % colorPalette.length]}
                                     item={item}
-                                    index={index}
                                     navigation={navigate}
                                     isImg={true}
                                     dispatch={dispatch}

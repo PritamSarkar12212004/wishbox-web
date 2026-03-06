@@ -1,7 +1,7 @@
 import apiPath from "../../consts/api/apiPath";
 import Notify from "../../functions/notify/Notify";
 import api from "../../services/api/api";
-import { initSetIdWatchListData } from "../../services/store/slice/watchlist/watchListProductSlice";
+import { initSetIdWatchListData } from "../../services/store/slice/watchlist/watchlistProductSlice";
 
 const ApiCallFetchWatchList = async ({
   dispatch,

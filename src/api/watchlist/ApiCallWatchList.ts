@@ -1,7 +1,7 @@
 import apiPath from "../../consts/api/apiPath";
 import api from "../../services/api/api";
 import { removeWatchListItem } from "../../services/store/slice/watchlist/watchListMainProductSlice";
-import { toggleWatchlist } from "../../services/store/slice/watchlist/watchListProductSlice";
+import { toggleWatchlist } from "../../services/store/slice/watchlist/watchlistProductSlice";
 
 const ApiCallWatchList = async ({
   data,

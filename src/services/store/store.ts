@@ -12,7 +12,7 @@ import gallerySlice from "./slice/Gallery/gallerySlice";
 import tempProductSlice from "./slice/product/tempProductSlice";
 import userDataSlice from "./slice/user/userDataSlice";
 import cartDataSlice from "./slice/cart/cartDataSlice";
-import watchListProductSlice from "./slice/watchlist/watchListProductSlice";
+import watchListProductSlice from "./slice/watchlist/watchlistProductSlice";
 import watchListMainProductSlice from "./slice/watchlist/watchListMainProductSlice";
 
 const rootReducer: any = combineReducers({

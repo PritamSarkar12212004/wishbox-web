@@ -8,18 +8,13 @@ import ApiCallRemoveSingleItem from '../../api/cart/ApiCallRemoveSingleItem';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 function CartPage() {
-  const data: {
-    image: string;
-    price: number;
-    quantity: number;
-    subTotal: number;
-    title: string
-  } = useSelector((state: any) => state.cartDataSlice.cartData)
+  const data: any = useSelector((state: any) => state.cartDataSlice.cartData)
   const userID = useSelector((state: any) => state.userDataSlice.mainUserID)
   type CartItem = {
     _id: any;
     image: string;
     price: number;
+    originalPrice: number;
     quantity: number;
     title: string;
   };

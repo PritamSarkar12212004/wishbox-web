@@ -36,7 +36,6 @@ function MainTopSellingProducts({ navigation, dispatch }: any) {
                     <MainTopSellingProductCard
                         key={item._id + '-' + index}
                         item={item}
-                        index={index}
                         navigation={navigation}
                         colors={colorPalette[index % colorPalette.length]}
                         dispatch={dispatch}

@@ -190,7 +190,6 @@ function MainHeader() {
                 <Box
                     sx={{
                         position: 'absolute',
-                        left: '1/2',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',

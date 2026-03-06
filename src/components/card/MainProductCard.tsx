@@ -1,9 +1,8 @@
 import type { TypeCollection } from "../../types/collections/typeCollection";
 
-function MainProductCard({ item, index, navigate }: {
+function MainProductCard({ item, index }: {
     item: TypeCollection;
     index: any;
-    navigate: any
 }) {
     return (
         <button

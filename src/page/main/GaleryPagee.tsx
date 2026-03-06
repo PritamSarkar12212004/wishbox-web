@@ -122,7 +122,7 @@ function GalleryPage() {
                                                 key={image._id}
                                                 className="group relative overflow-hidden rounded-lg cursor-pointer bg-gray-100 hover:shadow-xl transition-all duration-300"
                                             >
-                                                <Zoom zoomMargin={20} overlayBgColorEnd="rgba(0,0,0,0.95)">
+                                                <Zoom zoomMargin={20}>
                                                     <img
                                                         src={thumbnailUrl}
                                                         data-zoom-image={zoomUrl}

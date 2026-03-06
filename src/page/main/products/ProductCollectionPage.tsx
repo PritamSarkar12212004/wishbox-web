@@ -11,7 +11,7 @@ function ProductCollectionPage() {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [filteredCollections, setFilteredCollections] = useState<any>([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const searchRef = useRef(null);
+    const searchRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         let filtered = ProductCollcationData;
 
