@@ -1,4 +1,4 @@
-    import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ScrollReveal from '../../../components/ui/animation/ScrollReveal'
 import { FaStar, FaHeart, FaShoppingCart, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux';
@@ -264,7 +264,7 @@ function ShowProduct() {
                                         <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 opacity-0 group-hover:opacity-100 transition-opacity" />
                                         {
                                             loadingCart ? <Box sx={{ display: 'flex' }}>
-                                                <CircularProgress color='white' size={20} />
+                                                <CircularProgress color='inherit' size={20} />
                                             </Box> : isInCart ? <>  <FaShoppingCart className="relative z-10 w-5 h-5" />
                                                 <span className="relative z-10">View Cart</span></> : <><FaShoppingCart className="relative z-10 w-5 h-5" />
                                                 <span className="relative z-10">Add to Cart</span></>
