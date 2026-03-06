@@ -32,7 +32,7 @@ function MainProductOne({ navigate }: {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {data?.map((item: any, index: any) => (
-                    <MainProductCard key={item._id + '-' + index} item={item} index={index} navigate={navigate} />
+                    <MainProductCard key={item._id + '-' + index} item={item} index={index} />
                 ))}
             </div>
 
