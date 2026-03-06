@@ -1,11 +1,17 @@
 import type { Product } from '../../types/product/typeProduct';
 import routePath from '../../consts/routes/routePath';
+import { tempProductShowData } from '../../services/store/slice/product/tempProductSlice';
 function MainTopSellingProductCard({
     item,
     navigation,
     colors,
+    isImg,
+    dispatch
+
 }: {
     item: Product;
+    dispatch?: any
+    isImg?: boolean;
     navigation: any;
     colors: {
         border: string;
@@ -15,10 +21,12 @@ function MainTopSellingProductCard({
 }) {
     const primaryImage = item.images?.primary?.[0]?.url;
     const hoverImage = item.images?.primary?.[1]?.url;
-    const navigatePage = () => {
+    const navigatePage = async () => {
+        await dispatch(tempProductShowData(item))
         navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE, {
             state: {
-                navigateData: item,
+                navigateData: isImg ? null : item,
+                isImg: isImg
             }
         })
     }
@@ -38,7 +46,7 @@ function MainTopSellingProductCard({
             />
 
             {/* Image */}
-            <div className="relative h-52 overflow-hidden rounded-t-2xl bg-white">
+            <div className="relative h-40 sm:h-44 md:h-48 lg:h-52 overflow-hidden rounded-t-2xl bg-white">
                 {primaryImage && (
                     <img
                         src={primaryImage}
@@ -56,9 +64,9 @@ function MainTopSellingProductCard({
                 )}
 
                 {/* Bestseller Badge */}
-                <div className="absolute top-3 left-3">
+                <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                     <span
-                        className="px-3 py-1 text-xs font-medium rounded-full"
+                        className="px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full"
                         style={{
                             backgroundColor: "white",
                             border: `1px solid ${colors.border}`,
@@ -71,29 +79,28 @@ function MainTopSellingProductCard({
             </div>
 
             {/* Content */}
-            <div className="p-5 space-y-3">
-
-                <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+            <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 line-clamp-1">
                     {item.title}
                 </h3>
 
-                <p className="text-sm text-gray-500 line-clamp-2">
+                <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
                     {item.subtitle}
                 </p>
 
                 {/* Pricing */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-gray-900">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
                             ₹{item.pricing.salePrice}
                         </span>
-                        <span className="text-sm text-gray-400 line-through">
+                        <span className="text-xs sm:text-sm text-gray-400 line-through">
                             ₹{item.pricing.originalPrice}
                         </span>
                     </div>
 
                     <span
-                        className="px-2 py-1 text-xs rounded-full"
+                        className="px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded-full"
                         style={{
                             backgroundColor: "white",
                             border: `1px solid ${colors.border}`,
@@ -111,7 +118,7 @@ function MainTopSellingProductCard({
                 </div>
 
                 <button
-                    className="w-full py-2 rounded-xl text-sm font-medium transition-all duration-300"
+                    className="w-full py-1.5 cursor-pointer sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300"
                     style={{
                         backgroundColor: "white",
                         border: `1px solid ${colors.border}`,
@@ -126,7 +133,6 @@ function MainTopSellingProductCard({
                 >
                     View Product
                 </button>
-
             </div>
         </div>
     );

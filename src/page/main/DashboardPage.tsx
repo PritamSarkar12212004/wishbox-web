@@ -45,7 +45,7 @@ function DashboardPage() {
                 <DashHeroOne navigation={navigate} />
                 <MainProductOne navigate={navigate} />
                 <FullScreenPoster />
-                <MainTopSellingProducts navigation={navigate} />
+                <MainTopSellingProducts navigation={navigate} dispatch={dispatch} />
             </div>
         </ScrollReveal>
     )

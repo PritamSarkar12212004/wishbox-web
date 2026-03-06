@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+    import { useEffect, useState } from 'react'
 import ScrollReveal from '../../../components/ui/animation/ScrollReveal'
 import { FaStar, FaHeart, FaShoppingCart, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux';
 import { mainLoaderTogel } from '../../../services/store/slice/loading/loadingSlice';
 import ApiCallProductImageFetch from '../../../api/product/ApiCallProductImageFetch';
-import { tempProductShowData } from '../../../services/store/slice/product/tempProductSlice';
+import { tempProductShowData, clearTemProductShowData } from '../../../services/store/slice/product/tempProductSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ApiCallCart from '../../../api/cart/ApiCallCart';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -20,32 +20,42 @@ function ShowProduct() {
     const item = useSelector((state: any) => state.productTempData.productShowData);
     const cartData = useSelector((state: any) => state.cartDataSlice.cartIDData);
     const watchListData = useSelector((state: any) => state.watchlistSlice.idWatchListData)
-    const isInWatchlist = watchListData?.includes(item?.item?._id);
     const location: any = useLocation();
-    const { navigateData } = location.state;
+    const { navigateData, isImg } = location.state || {};
     const dispatch = useDispatch();
+    const naviate = useNavigate()
+
     const callApi = async () => {
-        dispatch(mainLoaderTogel(true));
-        const image = await ApiCallProductImageFetch({ gItem: navigateData.gallery, dispatch });
-        const data = {
-            image: image,
-            item: navigateData
-        };
-        dispatch(tempProductShowData(data));
+        if (isImg) {
+            dispatch(mainLoaderTogel(false));
+            return null
+        } else {
+            // Clear stale data first so loading spinner shows
+            dispatch(clearTemProductShowData());
+            dispatch(mainLoaderTogel(true));
+            const image = await ApiCallProductImageFetch({ gItem: navigateData.gallery, dispatch });
+            const data = {
+                image: image,
+                item: navigateData
+            };
+            dispatch(tempProductShowData(data));
+        }
     };
-    if (!item || !item.item) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500"></div>
-            </div>
-        );
-    }
-    const product = item.item;
-    const isInCart = cartData?.includes(product._id);
-    const salePrice = product.pricing?.salePrice || 0;
-    const originalPrice = product.pricing?.originalPrice || 0;
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "instant" });
+        callApi();
+    }, []);
+
+    // Derive product safely from Redux state
+    const product = item ? (isImg ? item : item.item) : null;
+
+    const isInWatchlist = watchListData?.includes(product?._id);
+    const isInCart = cartData?.includes(product?._id);
+    const salePrice = product?.pricing?.salePrice || 0;
+    const originalPrice = product?.pricing?.originalPrice || 0;
     const savingPercent = originalPrice > 0 ? Math.round(((originalPrice - salePrice) / originalPrice) * 100) : 0;
-    const specifications = [
+    const specifications = product ? [
         { label: 'GSM', value: product.paperSpecs?.gsm ? `${product.paperSpecs.gsm} GSM` : 'N/A' },
         {
             label: 'Dimensions', value: product.paperSpecs?.width && product.paperSpecs?.height
@@ -53,7 +63,7 @@ function ShowProduct() {
                 : 'N/A'
         },
         { label: 'Stock', value: product.stockStatus === 'in_stock' ? `${product.stock} units` : 'Out of stock' }
-    ];
+    ] : [];
     const reviews = {
         rating: 4.8,
         count: 245,
@@ -63,11 +73,18 @@ function ShowProduct() {
             { label: 'Delivery', value: 4.8 }
         ]
     };
-    const naviate = useNavigate()
+
+    if (!item || !product) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500"></div>
+            </div>
+        );
+    }
     const cartAdd = async () => {
         setLoadingCart(true)
         const data = {
-            item: item.item,
+            item: product,
             quantity: quantity,
             price: salePrice,
             userId: userId
@@ -89,10 +106,7 @@ function ShowProduct() {
             data: data
         })
     }
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "instant" });
-        callApi();
-    }, []);
+
 
     return (
         <ScrollReveal>
@@ -133,26 +147,29 @@ function ShowProduct() {
                                 )}
                             </div>
 
-                            {item.image && item.image.length > 0 && (
-                                <div className="grid grid-cols-4 gap-3">
-                                    {item.image.map((img: any, index: number) => (
-                                        <button
-                                            key={index}
-                                            onClick={() => setActiveImageIndex(index)}
-                                            className={`aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === index
-                                                ? 'border-rose-500 shadow-md'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                        >
-                                            <img
-                                                src={img.versions?.[0]?.url || img.url || '/placeholder-thumb.jpg'}
-                                                alt={`Thumbnail ${index + 1}`}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            {(() => {
+                                const galleryImages = isImg ? item?.gallery : item?.image;
+                                return galleryImages && galleryImages.length > 0 && (
+                                    <div className="grid grid-cols-4 gap-3">
+                                        {galleryImages.map((img: any, index: number) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setActiveImageIndex(index)}
+                                                className={`aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === index
+                                                    ? 'border-rose-500 shadow-md'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                                    }`}
+                                            >
+                                                <img
+                                                    src={img.versions?.[0]?.url || img.url || '/placeholder-thumb.jpg'}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Right Column - Details */}

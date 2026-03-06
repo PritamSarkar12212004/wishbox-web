@@ -3,7 +3,7 @@ import routePath from "../../../consts/routes/routePath";
 import { useSelector } from "react-redux";
 import type { Product } from "../../../types/product/typeProduct";
 
-function MainTopSellingProducts({ navigation }: any) {
+function MainTopSellingProducts({ navigation, dispatch }: any) {
     const colorPalette = [
         { border: "#E6B8C7", bg: "#FFEFF4", accent: "#D97A9A" },
         { border: "#BFDFFF", bg: "#EEF7FF", accent: "#5DADE2" },
@@ -16,7 +16,7 @@ function MainTopSellingProducts({ navigation }: any) {
     ];
     const data: Product[] = useSelector((state: any) => state.product.product)
     return (
-        <div className='w-full flex flex-col gap-5 sm:gap-6 md:gap-8 py-4 sm:py-6 md:py-10 px-3 sm:px-4 md:px-6 lg:px-8'>
+        <div className='w-full flex flex-col gap-5 sm:gap-6 md:gap-8 py-4 sm:py-6 md:py-10  sm:px-4 md:px-6 lg:px-8'>
             <div className="w-full flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 px-2">
                 <div className="relative inline-block">
                     <span className="relative px-3 py-1.5 bg-linear-to-r from-amber-500 to-amber-600 text-white text-xs sm:text-sm font-bold rounded-full uppercase tracking-wider z-10">
@@ -39,13 +39,15 @@ function MainTopSellingProducts({ navigation }: any) {
                         index={index}
                         navigation={navigation}
                         colors={colorPalette[index % colorPalette.length]}
+                        dispatch={dispatch}
+                        isImg={false}
                     />
                 ))}
             </div>
             <div className="flex justify-center mt-4 sm:mt-6">
                 <button
                     onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOP_PAGE)}
-                    className="px-6 py-3 text-sm sm:text-base font-medium text-gray-700 border border-gray-300 rounded-full hover:border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                    className="px-6 py-3 text-sm sm:text-base font-medium cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-2"
                 >
                     View All Products
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -53,9 +53,11 @@ function WishlistPage() {
 
     const navigation = useNavigate()
     const navigateScreen = (item: any) => {
+        const isImg = false
         navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE, {
             state: {
                 navigateData: item,
+                isImg: isImg
             }
         })
     }

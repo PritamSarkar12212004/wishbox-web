@@ -7,6 +7,7 @@ const apiPath = {
   },
   PRODUCT: {
     FETCH_PRODUCT_IMAGE: "/product/fetch_product_image",
+    FETCH_FULL_PRODUCT: "/product/fetch_full_products",
   },
   CART: {
     ADD_TO_CART: "/product/product_add_cart",
