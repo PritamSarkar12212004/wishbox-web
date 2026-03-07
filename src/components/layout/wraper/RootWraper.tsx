@@ -132,7 +132,7 @@ function RootWraper({ children }: any) {
                     </Box>
                 </Modal>
             )}
-            <div className="flex-1 px-3 sm:px-4 md:px-6 pt-3 md:pt-4 relative">
+            <div className="flex-1 px-2 sm:px-3 md:px-4 pt-3 md:pt-4 relative">
                 {<MainHeader />}
                 <div className="mt-2 md:mt-0">
                     {children}

@@ -199,7 +199,7 @@ function ProductCollectionPage() {
                                 {showSuggestions && suggestionList.length > 0 && (
                                     <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-gray-200 shadow-xl z-50 overflow-hidden animate-fadeIn">
                                         <div className="p-2 max-h-64 overflow-y-auto">
-                                            {suggestionList.map((title: any, idx: any) => (
+                                            {suggestionList.map((title, idx) => (
                                                 <button
                                                     key={idx}
                                                     onClick={() => {
