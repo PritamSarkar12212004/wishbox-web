@@ -5,6 +5,9 @@ const apiPath = {
   GALLERY: {
     FETCH_GALLERY_DATA: "/gallery/fetch_Gallery_data",
   },
+  CONTACT: {
+    FULL_CONTACT: "/contact/full_contact",
+  },
   PRODUCT: {
     FETCH_PRODUCT_IMAGE: "/product/fetch_product_image",
     FETCH_FULL_PRODUCT: "/product/fetch_full_products",

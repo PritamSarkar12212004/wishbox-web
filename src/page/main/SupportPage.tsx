@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ScrollReveal from "../../components/ui/animation/ScrollReveal";
+import APiCallFullContact from '../../api/contact/APiCallFullContact';
 
 function ContactPage() {
     const [formData, setFormData] = useState({
@@ -21,28 +22,36 @@ function ContactPage() {
         { id: 'careers', label: 'Careers', icon: '👔' },
         { id: 'feedback', label: 'Feedback', icon: '⭐' }
     ];
-
     const contactInfo = [
         {
             icon: '📞',
             title: 'Call Us',
-            details: '+91 98765 43210',
+            details: (
+                <>
+                    <a href="tel:+918208959945" className="text-blue-600 hover:text-blue-700 font-medium text-lg block mb-1 transition-colors">
+                        +91 82089 59945
+                    </a>
+                    <a href="tel:+919403016250" className="text-blue-600 hover:text-blue-700 font-medium text-lg block transition-colors">
+                        +91 94030 16250
+                    </a>
+                </>
+            ),
             subtitle: 'Monday to Saturday, 9 AM to 8 PM',
-            action: 'tel:+919876543210'
+            action: null // No single action because we have two numbers
         },
         {
             icon: '📧',
             title: 'Email Us',
-            details: 'hello@paperdecor.in',
+            details: 'wishboxpune@gmail.com',
             subtitle: 'Response within 24 hours',
-            action: 'mailto:hello@paperdecor.in'
+            action: 'mailto:wishboxpune@gmail.com'
         },
         {
             icon: '📍',
             title: 'Visit Us',
-            details: '123 Craft Street, Jaipur, Rajasthan',
+            details: 'Behind Mayur Medical, Srushti Chowk, Sudarshan Nagar, Pimple Gurav, PCMC, Maharashtra 411061',
             subtitle: 'Showroom open 10 AM to 7 PM',
-            action: 'https://maps.google.com'
+            action: 'https://maps.google.com/?q=18.5973091,73.8158199'
         },
         {
             icon: '⏰',
@@ -52,12 +61,21 @@ function ContactPage() {
             action: null
         }
     ];
-
     const socialLinks = [
-        { platform: 'Instagram', icon: '📸', handle: '@paperdecor', color: 'bg-pink-100 hover:bg-pink-200 text-pink-700', link: '#' },
-        { platform: 'Facebook', icon: '👥', handle: 'PaperDecor', color: 'bg-blue-100 hover:bg-blue-200 text-blue-700', link: '#' },
-        { platform: 'WhatsApp', icon: '💬', handle: '+91 98765 43210', color: 'bg-green-100 hover:bg-green-200 text-green-700', link: '#' },
-        { platform: 'LinkedIn', icon: '💼', handle: 'PaperDecor', color: 'bg-blue-100 hover:bg-blue-200 text-blue-700', link: '#' }
+        {
+            platform: 'Instagram',
+            icon: '📸',
+            handle: '@wishbox_paper_decor_company',
+            color: 'bg-pink-100 hover:bg-pink-200 text-pink-700',
+            link: 'https://www.instagram.com/wishbox_paper_decor_company?igsh=d2o2eGkyamZtaGlv'
+        },
+        {
+            platform: 'WhatsApp',
+            icon: '💬',
+            handle: '+91 82089 59945',
+            color: 'bg-green-100 hover:bg-green-200 text-green-700',
+            link: 'https://wa.me/918208959945'
+        }
     ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -67,12 +85,21 @@ function ContactPage() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', { ...formData, topic: selectedTopic });
+        await APiCallFullContact({
+            data: formData,
+            supportType: selectedTopic
+        });
         setIsSubmitted(true);
         setTimeout(() => setIsSubmitted(false), 3000);
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            subject: '',
+            message: ''
+        });
     };
 
     return (
@@ -117,7 +144,9 @@ function ContactPage() {
                                                             {info.details}
                                                         </a>
                                                     ) : (
-                                                        <p className="text-gray-900 font-medium text-lg mb-1">{info.details}</p>
+                                                        <div className="text-gray-900 font-medium text-lg mb-1">
+                                                            {info.details}
+                                                        </div>
                                                     )}
                                                     <p className="text-gray-500 text-sm">{info.subtitle}</p>
                                                 </div>
@@ -134,6 +163,8 @@ function ContactPage() {
                                             <a
                                                 key={index}
                                                 href={social.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className={`p-3 rounded-lg ${social.color} border border-transparent hover:border-gray-300 transform hover:-translate-y-1 transition-all duration-300`}
                                             >
                                                 <div className="text-xl mb-1">{social.icon}</div>
@@ -191,7 +222,7 @@ function ContactPage() {
                                                 key={topic.id}
                                                 type="button"
                                                 onClick={() => setSelectedTopic(topic.id)}
-                                                className={`p-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${selectedTopic === topic.id
+                                                className={`p-3 rounded-lg cursor-pointer border transition-all duration-200 flex flex-col items-center justify-center ${selectedTopic === topic.id
                                                     ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                     : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 text-gray-700'
                                                     }`}
@@ -344,11 +375,17 @@ function ContactPage() {
                                             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gray-800 flex items-center justify-center">
                                                 <span className="text-2xl text-white">📍</span>
                                             </div>
-                                            <h3 className="font-bold text-gray-900 mb-1">123 Craft Street</h3>
-                                            <p className="text-gray-600 text-sm">Jaipur, Rajasthan 302001</p>
-                                            <button className="mt-3 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:border-blue-300 hover:text-blue-700 transition-colors">
+                                            <h3 className="font-bold text-gray-900 mb-1">Behind Mayur Medical</h3>
+                                            <p className="text-gray-600 text-sm">Srushti Chowk, Sudarshan Nagar, Pimple Gurav</p>
+                                            <p className="text-gray-600 text-sm">PCMC, Maharashtra 411061</p>
+                                            <a
+                                                href="https://maps.google.com/?q=18.5973091,73.8158199"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-3 inline-block px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:border-blue-300 hover:text-blue-700 transition-colors"
+                                            >
                                                 Get Directions
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -368,10 +405,9 @@ function ContactPage() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </ScrollReveal>
     )
 }
 
-export default ContactPage
+export default ContactPage;
