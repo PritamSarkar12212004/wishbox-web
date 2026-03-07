@@ -36,7 +36,7 @@ function MainProductOne() {
   }
 
   return (
-    <section className="w-full flex flex-col gap-6 sm:gap-8 md:gap-10 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 bg-neutral-50">
+    <section className="w-full flex flex-col gap-6 sm:gap-8 md:gap-10 py-6 sm:py-8 md:py-12  bg-neutral-50">
       {/* Header Section */}
       <div className="flex flex-col items-center text-center gap-3 sm:gap-4">
         <div className="relative">

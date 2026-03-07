@@ -3,7 +3,6 @@ const routePath = {
     DASHBOARD_PAGE: "/",
     SUPPORT_PAGE: "/contact",
     SHOP_PAGE: "/shop",
-    ABOUT_PAGE: "/about",
     PRODUCT_PAGE: "/product",
     CART_PAGE: "/cart",
     WISHLIST_PAGE: "/wishlist",

@@ -358,7 +358,7 @@ function ContactPage() {
 
                                     <button
                                         type="submit"
-                                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg shadow-sm hover:shadow transition-all duration-300"
+                                        className="w-full cursor-pointer py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg shadow-sm hover:shadow transition-all duration-300"
                                     >
                                         Send Message
                                     </button>

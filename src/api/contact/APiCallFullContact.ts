@@ -10,7 +10,6 @@ const APiCallFullContact = async ({
   supportType: any;
 }) => {
   try {
-    console.log(supportType);
     await api
       .post(apiPath.CONTACT.FULL_CONTACT, {
         supportEmail: data.email,

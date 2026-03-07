@@ -4,7 +4,6 @@ import PrivateRoute from "./PrivateRoutes";
 import DashboardPage from "../page/main/DashboardPage";
 import SupportPage from "../page/main/SupportPage";
 import routePath from "../consts/routes/routePath";
-import AboutPage from "../page/main/AboutPage";
 import ShopPage from "../page/main/ShopPage";
 import CartPage from "../page/main/CartPage";
 import WishlistPage from "../page/main/WishlistPage";
@@ -21,7 +20,6 @@ function App() {
                 <Route element={<PrivateRoute />}>
                     <Route path={routePath.PRIVATE_ROUTE.DASHBOARD_PAGE} element={<DashboardPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SUPPORT_PAGE} element={<SupportPage />} />
-                    <Route path={routePath.PRIVATE_ROUTE.ABOUT_PAGE} element={<AboutPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.SHOP_PAGE} element={<ShopPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.CART_PAGE
                     } element={<CartPage />} />

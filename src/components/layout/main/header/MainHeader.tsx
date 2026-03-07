@@ -31,7 +31,6 @@ function MainHeader() {
     const tabs = [
         { Title: "Home", path: routePath.PRIVATE_ROUTE.DASHBOARD_PAGE },
         { Title: "Shop", path: routePath.PRIVATE_ROUTE.SHOP_PAGE },
-        { Title: "About", path: routePath.PRIVATE_ROUTE.ABOUT_PAGE },
         { Title: "Contact", path: routePath.PRIVATE_ROUTE.SUPPORT_PAGE }
     ];
 
@@ -76,7 +75,11 @@ function MainHeader() {
                 </IconButton>
             </Box>
             <List>
-                {tabs.map((item) => (
+                {[
+                    ...tabs.slice(0, 2),
+                    { Title: "Collection", path: routePath.PRIVATE_ROUTE.COLLECTION_PAGE },
+                    ...tabs.slice(2)
+                ].map((item) => (
                     <ListItem key={item.Title} disablePadding>
                         <ListItemButton
                             onClick={() => { navigate(item.path); handleDrawerToggle(); }}

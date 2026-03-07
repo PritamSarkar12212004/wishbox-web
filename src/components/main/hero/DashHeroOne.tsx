@@ -25,7 +25,7 @@ function DashHeroOne({ navigation }: {
                     <p className="text-lg text-neutral-600 max-w-2xl leading-relaxed">
                         Discover our handcrafted sustainable paper decorations that transform ordinary spaces into extraordinary celebrations. Loved by thousands worldwide.
                     </p>
-                    <div className="flex flex-wrap gap-6 pt-4">
+                    {/* <div className="flex flex-wrap gap-6 pt-4">
                         <div className="text-center">
                             <div className="text-3xl font-bold bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">5K+</div>
                             <div className="text-sm text-neutral-500">Happy Customers</div>
@@ -38,7 +38,7 @@ function DashHeroOne({ navigation }: {
                             <div className="text-3xl font-bold bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">4.9★</div>
                             <div className="text-sm text-neutral-500">Average Rating</div>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="flex flex-wrap gap-4 pt-6">
                         <button
                             onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOP_PAGE)}
@@ -69,7 +69,7 @@ function DashHeroOne({ navigation }: {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-4 pt-8">
+                    {/* <div className="flex items-center gap-4 pt-8">
                         <div className="flex -space-x-2">
                             {[1, 2, 3, 4].map((i) => (
                                 <div
@@ -81,7 +81,7 @@ function DashHeroOne({ navigation }: {
                         <div className="text-sm text-neutral-600">
                             <span className="font-semibold">Join 5,000+</span> satisfied customers
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="relative">
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl transform group-hover:rotate-1 transition-transform duration-700">
