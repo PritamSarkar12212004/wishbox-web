@@ -42,7 +42,7 @@ function DashHeroOne({ navigation }: {
                     <div className="flex flex-wrap gap-4 pt-6">
                         <button
                             onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOP_PAGE)}
-                            className="group/btn relative px-8 py-4 rounded-2xl font-bold text-white bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3"
+                            className="group/btn relative cursor-pointer px-8 py-4 rounded-2xl font-bold text-white bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3"
                         >
                             Shop Collection
                             <svg
@@ -60,7 +60,7 @@ function DashHeroOne({ navigation }: {
 
                         <button
                             onClick={() => navigation(routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE)}
-                            className="px-8 py-4 rounded-2xl font-bold text-neutral-700 border-2 border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-3"
+                            className="px-8 py-4 rounded-2xl cursor-pointer font-bold text-neutral-700 border-2 border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-3"
                         >
                             View Gallery
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

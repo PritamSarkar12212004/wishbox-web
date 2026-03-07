@@ -4,52 +4,71 @@ import MainTopSellingProductCard from '../../components/card/MainTopSellingProdu
 import { useDispatch } from 'react-redux';
 
 function CollectionListPage() {
-    const navigation = useNavigate()
-    const location: any = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
     const { data } = location.state || {};
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+
     const colorPalette = [
-        { border: "#E6B8C7", bg: "#FFEFF4", accent: "#D97A9A" },
-        { border: "#BFDFFF", bg: "#EEF7FF", accent: "#5DADE2" },
-        { border: "#BEE5D3", bg: "#ECFFF6", accent: "#52BE80" },
-        { border: "#FFE0B3", bg: "#FFF6E8", accent: "#F5B041" },
-        { border: "#D7C4F2", bg: "#F4EEFF", accent: "#A569BD" },
-        { border: "#BFEDE6", bg: "#EFFFFB", accent: "#48C9B0" },
-        { border: "#F5C6C6", bg: "#FFF1F1", accent: "#EC7063" },
-        { border: "#D6DBDF", bg: "#F4F6F7", accent: "#7F8C8D" },
+        { border: '#E6B8C7', bg: '#FFEFF4', accent: '#D97A9A' },
+        { border: '#BFDFFF', bg: '#EEF7FF', accent: '#5DADE2' },
+        { border: '#BEE5D3', bg: '#ECFFF6', accent: '#52BE80' },
+        { border: '#FFE0B3', bg: '#FFF6E8', accent: '#F5B041' },
+        { border: '#D7C4F2', bg: '#F4EEFF', accent: '#A569BD' },
+        { border: '#BFEDE6', bg: '#EFFFFB', accent: '#48C9B0' },
+        { border: '#F5C6C6', bg: '#FFF1F1', accent: '#EC7063' },
+        { border: '#D6DBDF', bg: '#F4F6F7', accent: '#7F8C8D' },
     ];
+
+    if (!data || data.length === 0) {
+        return (
+            <ScrollReveal>
+                <div className="flex min-h-[50vh] items-center justify-center px-4 py-12">
+                    <p className="text-center text-gray-500">
+                        No products found in this collection.
+                    </p>
+                </div>
+            </ScrollReveal>
+        );
+    }
+
     return (
         <ScrollReveal>
-            <div className='w-full flex flex-col gap-8 py-12 px-4 md:px-8'>
-                <div className="w-full flex flex-col items-center justify-center gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-6 h-0.5 bg-amber-500"></div>
-                        <span className="text-amber-500 font-medium tracking-widest text-sm">TOP SELLERS</span>
-                        <div className="w-6 h-0.5 bg-amber-500"></div>
+            <section className="w-full px-4 py-8 md:px-8 md:py-12 lg:py-16">
+                {/* Header */}
+                <div className="mx-auto mb-8 max-w-7xl text-center md:mb-12">
+                    <div className="mb-3 flex items-center justify-center gap-3">
+                        <div className="h-0.5 w-6 bg-amber-500" />
+                        <span className="text-xs font-medium tracking-widest text-amber-500 sm:text-sm">
+                            TOP SELLERS
+                        </span>
+                        <div className="h-0.5 w-6 bg-amber-500" />
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 text-center">
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
                         Our <span className="text-amber-500">Bestselling</span> Products
-                    </h2>
-                    <p className="text-gray-600 text-center max-w-2xl">
-                        Discover our most popular handmade paper decorations loved by thousands of customers worldwide
+                    </h1>
+                    <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600 sm:text-base">
+                        Discover our most popular handmade paper decorations loved by
+                        thousands of customers worldwide
                     </p>
                 </div>
 
-                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {data.map((item: any, index: any) => (
+                {/* Product Grid - Two columns on mobile, three on lg, four on xl */}
+                <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4 xl:gap-6">
+                    {data.map((item: any, index: number) => (
                         <MainTopSellingProductCard
-                            key={item._id + '-' + index}
+                            key={`${item._id}-${index}`}
                             item={item}
-                            navigation={navigation}
+                            navigation={navigate}
                             colors={colorPalette[index % colorPalette.length]}
                             dispatch={dispatch}
                             isImg={false}
                         />
                     ))}
                 </div>
-            </div>
+            </section>
         </ScrollReveal>
-    )
+    );
 }
 
-export default CollectionListPage
+export default CollectionListPage;

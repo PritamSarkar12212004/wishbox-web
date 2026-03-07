@@ -1,16 +1,16 @@
 import type { Product } from '../../types/product/typeProduct';
 import routePath from '../../consts/routes/routePath';
 import { tempProductShowData } from '../../services/store/slice/product/tempProductSlice';
+
 function MainTopSellingProductCard({
     item,
     navigation,
     colors,
     isImg,
-    dispatch
-
+    dispatch,
 }: {
     item: Product;
-    dispatch?: any
+    dispatch?: any;
     isImg?: boolean;
     navigation: any;
     colors: {
@@ -21,120 +21,118 @@ function MainTopSellingProductCard({
 }) {
     const primaryImage = item.images?.primary?.[0]?.url;
     const hoverImage = item.images?.primary?.[1]?.url;
+
     const navigatePage = async () => {
-        await dispatch(tempProductShowData(item))
+        await dispatch(tempProductShowData(item));
         navigation(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_PAGE, {
             state: {
                 navigateData: isImg ? null : item,
-                isImg: isImg
-            }
-        })
-    }
+                isImg,
+            },
+        });
+    };
+
+    const discountPercentage =
+        item.pricing.originalPrice > 0
+            ? Math.round(
+                ((item.pricing.originalPrice - item.pricing.salePrice) /
+                    item.pricing.originalPrice) *
+                100
+            )
+            : 0;
+
     return (
-        <div
-            className="group cursor-pointer relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+        <article
+            className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             style={{
                 backgroundColor: colors.bg,
-                border: `1px solid ${colors.border}`
+                border: `1px solid ${colors.border}`,
             }}
-            onClick={() => navigatePage()}
+            onClick={navigatePage}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    navigatePage();
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`View details for ${item.title}`}
         >
-            {/* Accent Top Line */}
+            {/* Accent top line */}
             <div
-                className="absolute top-0 left-0 w-full h-[2px]"
+                className="absolute left-0 top-0 h-1 w-full"
                 style={{ backgroundColor: colors.accent }}
             />
 
-            {/* Image */}
-            <div className="relative h-40 sm:h-44 md:h-48 lg:h-52 overflow-hidden rounded-t-2xl bg-white">
+            {/* Image with fixed aspect ratio */}
+            <div className="relative aspect-[4/3] overflow-hidden bg-white">
                 {primaryImage && (
                     <img
                         src={primaryImage}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        loading="lazy"
                     />
                 )}
 
                 {hoverImage && (
                     <img
                         src={hoverImage}
-                        alt={item.title}
-                        className="absolute top-0 left-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        alt={`${item.title} alternate view`}
+                        className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        loading="lazy"
                     />
                 )}
 
-                {/* Bestseller Badge */}
-                <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                {/* Bestseller badge */}
+                <div className="absolute left-2 top-2 z-10 sm:left-3 sm:top-3">
                     <span
-                        className="px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full"
+                        className="inline-block rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm sm:px-3 sm:py-1 sm:text-xs"
                         style={{
-                            backgroundColor: "white",
                             border: `1px solid ${colors.border}`,
-                            color: colors.accent
+                            color: colors.accent,
                         }}
                     >
                         Bestseller
                     </span>
                 </div>
+
+                {/* Discount badge (if applicable) */}
+                {discountPercentage > 0 && (
+                    <div className="absolute right-2 top-2 z-10 sm:right-3 sm:top-3">
+                        <span
+                            className="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold text-white sm:px-3 sm:py-1 sm:text-xs"
+                            style={{ backgroundColor: colors.accent }}
+                        >
+                            {discountPercentage}% OFF
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Content */}
-            <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 line-clamp-1">
+            <div className="flex flex-1 flex-col p-2 sm:p-3 md:p-4">
+                <h3 className="mb-1 text-xs font-semibold text-gray-900 line-clamp-1 sm:text-sm md:text-base">
                     {item.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                <p className="mb-2 text-[10px] text-gray-500 line-clamp-2 sm:text-xs md:text-sm">
                     {item.subtitle}
                 </p>
 
-                {/* Pricing */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 sm:gap-2">
-                        <span className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
-                            ₹{item.pricing.salePrice}
-                        </span>
-                        <span className="text-xs sm:text-sm text-gray-400 line-through">
+                {/* Price */}
+                <div className="mb-2 flex flex-wrap items-center gap-1 sm:mb-3 sm:gap-2">
+                    <span className="text-xs font-bold text-gray-900 sm:text-sm md:text-base">
+                        ₹{item.pricing.salePrice}
+                    </span>
+                    {item.pricing.originalPrice > item.pricing.salePrice && (
+                        <span className="text-[9px] text-gray-400 line-through sm:text-xs">
                             ₹{item.pricing.originalPrice}
                         </span>
-                    </div>
-
-                    <span
-                        className="px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded-full"
-                        style={{
-                            backgroundColor: "white",
-                            border: `1px solid ${colors.border}`,
-                            color: "#555"
-                        }}
-                    >
-                        {item.pricing.originalPrice > 0
-                            ? `${Math.round(
-                                ((item.pricing.originalPrice - item.pricing.salePrice) /
-                                    item.pricing.originalPrice) *
-                                100
-                            )}% OFF`
-                            : "0% OFF"}
-                    </span>
+                    )}
                 </div>
-
-                <button
-                    className="w-full py-1.5 cursor-pointer sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300"
-                    style={{
-                        backgroundColor: "white",
-                        border: `1px solid ${colors.border}`,
-                        color: "#333"
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.bg;
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "white";
-                    }}
-                >
-                    View Product
-                </button>
             </div>
-        </div>
+        </article>
     );
 }
 
