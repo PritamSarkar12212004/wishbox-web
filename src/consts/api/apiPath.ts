@@ -38,5 +38,8 @@ const apiPath = {
     FETCH_FULL_ORDER: "/order/fetch_order_detiles",
     CANCEL_ORDER: "/order/cancel_order",
   },
+  SHIPROCKET: {
+    AUTH_TOKEN: "https://apiv2.shiprocket.in/v1/external/auth/login",
+  },
 };
 export default apiPath;

@@ -21,6 +21,7 @@ function DashboardPage() {
                     ApiCallFetchDashBoard({
                         dispatch,
                     }),
+
                     ApiCallFetchWatchList({
                         data: userId,
                         dispatch: dispatch

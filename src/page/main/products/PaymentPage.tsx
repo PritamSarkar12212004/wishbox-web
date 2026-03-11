@@ -18,12 +18,14 @@ import {
     FaWhatsapp,
     FaEnvelope,
     FaPhoneAlt,
+    FaMapMarkerAlt,
 } from 'react-icons/fa';
 import { FiHelpCircle } from 'react-icons/fi';
 import { BiCopy } from 'react-icons/bi';
 import { IoMdClose } from 'react-icons/io';
 import ApiCallFetchPaymentInfo from '../../../api/payment/ApiCallFetchPaymentInfo';
 import ApiCalllCancelOrder from '../../../api/order/ApiCalllCancelOrder';
+import ApiCallShiprocketAuth from '../../../api/shiprocket/ApiCallShiprocketAuth';
 
 // Types
 interface OrderItem {
@@ -65,12 +67,29 @@ interface PaymentInfo {
     bankName?: string;
 }
 
+interface Address {
+    fullName: string;
+    addressLine: string;
+    city: string;
+    district: string;
+    state: string;
+    pincode: string;
+}
+
 const statusSteps = [
     { key: 'payment_pending', label: 'Payment Pending', icon: FaHourglassHalf },
     { key: 'processing', label: 'Processing', icon: FaSpinner },
     { key: 'shipped', label: 'Shipped', icon: FaTruck },
     { key: 'delivered', label: 'Delivered', icon: FaCheck },
 ];
+
+// Dummy delivery charge calculator – replace with your logic
+const calculateDeliveryCharge = (pincode: string): number => {
+    if (pincode.startsWith('1')) return 50;
+    if (pincode.startsWith('2')) return 60;
+    if (pincode.startsWith('3')) return 70;
+    return 80;
+};
 
 const PaymentPage = () => {
     const location = useLocation();
@@ -80,7 +99,20 @@ const PaymentPage = () => {
     const paymentInfo = useSelector((state: any) => state.paymentInfoSlice?.paymentInfoData) as PaymentInfo | null;
     const userId = useSelector((state: any) => state.userDataSlice.mainUserID);
 
-    // Local state
+    // Step management: 'address' or 'payment'
+    const [currentStep, setCurrentStep] = useState<'address' | 'payment'>('address');
+
+    const [address, setAddress] = useState<Address>({
+        fullName: '',
+        addressLine: '',
+        city: '',
+        district: '',
+        state: '',
+        pincode: '',
+    });
+
+    const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
+    const [totalWithDelivery, setTotalWithDelivery] = useState<number>(0);
     const [ordersData, setOrdersData] = useState<OrderData | null>(null);
     const [utr, setUtr] = useState('');
     const [screenshot, setScreenshot] = useState<File | null>(null);
@@ -91,8 +123,6 @@ const PaymentPage = () => {
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const [cancelSuccess, setCancelSuccess] = useState(false);
-
-    // Load order data
     useEffect(() => {
         if (location.state?.fullData) {
             setOrdersData(location.state.item as OrderData);
@@ -100,9 +130,10 @@ const PaymentPage = () => {
             console.error('No order data found');
         }
     }, [location.state]);
-
-    // Fetch payment info
     useEffect(() => {
+        ApiCallShiprocketAuth({
+            dispatch: dispatch
+        })
         const fetchPaymentInfo = async () => {
             setLoading(true);
             try {
@@ -117,6 +148,22 @@ const PaymentPage = () => {
     }, [dispatch]);
 
     // Handlers
+    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setAddress(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddressSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const charge = calculateDeliveryCharge(address.pincode);
+        setDeliveryCharge(charge);
+        if (ordersData) {
+            setTotalWithDelivery(ordersData.totalAmount + charge);
+        }
+        setCurrentStep('payment');
+        console.log('Address saved:', address);
+    };
+
     const handleCopy = async () => {
         if (!paymentInfo?.upiId) return;
         try {
@@ -160,15 +207,10 @@ const PaymentPage = () => {
                 productId: ordersData._id,
                 setCancelLoading: setCancelling,
             });
-
-            // Show success in modal
             setCancelSuccess(true);
-
-            // After a short delay, close modal and update local order status
             setTimeout(() => {
                 setCancelModalOpen(false);
                 setCancelSuccess(false);
-                // Update order status locally to hide cancel button
                 setOrdersData(prev => prev ? { ...prev, orderStatus: 'cancelled' } : null);
             }, 1500);
         } catch (error) {
@@ -188,9 +230,8 @@ const PaymentPage = () => {
     const isCompleted = paymentStatus === 'completed';
 
     const orderStatus = ordersData?.orderStatus || 'payment_pending';
+    const isCancelled = orderStatus === 'cancelled';
     const currentStatusIndex = statusSteps.findIndex(s => s.key === orderStatus);
-
-    // Show cancel button only if payment is pending AND order is not already cancelled/completed/shipped/delivered
     const canCancel = isWaiting && !['cancelled', 'completed', 'shipped', 'delivered'].includes(orderStatus);
 
     const getItemImage = (item: OrderItem): string => {
@@ -236,29 +277,32 @@ const PaymentPage = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-6">
-                {/* ORDER SUMMARY CARD */}
+                {/* ORDER SUMMARY CARD (always shown) */}
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
                     <div className="p-6 sm:p-8">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <h2 className="text-xl font-bold text-gray-900">Order Summary</h2>
                             <div className="flex items-center gap-3 flex-wrap">
                                 <span
-                                    className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
-                                        isWaiting
+                                    className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${isCancelled
+                                        ? 'bg-red-100 text-red-800'
+                                        : isWaiting
                                             ? 'bg-amber-100 text-amber-800'
                                             : isCompleted
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'
-                                    }`}
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-red-100 text-red-800'
+                                        }`}
                                 >
-                                    {isWaiting ? (
+                                    {isCancelled ? (
+                                        <FaTimesCircle className="mr-2" />
+                                    ) : isWaiting ? (
                                         <FaHourglassHalf className="mr-2" />
                                     ) : isCompleted ? (
                                         <FaRegCheckCircle className="mr-2" />
                                     ) : (
                                         <FaTimesCircle className="mr-2" />
                                     )}
-                                    {ordersData.orderStatus || 'Payment Pending'}
+                                    {isCancelled ? 'Cancelled' : ordersData.orderStatus || 'Payment Pending'}
                                 </span>
                                 {isCompleted && (
                                     <button
@@ -324,13 +368,30 @@ const PaymentPage = () => {
                                 </div>
                             </div>
 
-                            <div className="border-t border-gray-200 pt-4 flex justify-between items-center">
-                                <span className="text-base font-medium text-gray-700">Total Amount</span>
-                                <span className="text-2xl font-bold text-gray-900">₹{ordersData.totalAmount}</span>
+                            {/* Total Amount */}
+                            <div className="border-t border-gray-200 pt-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-base font-medium text-gray-700">Subtotal</span>
+                                    <span className="text-lg font-semibold text-gray-900">₹{ordersData.totalAmount}</span>
+                                </div>
+                                {currentStep === 'payment' && !isCancelled && (
+                                    <div className="flex justify-between items-center mt-2">
+                                        <span className="text-base font-medium text-gray-700">Delivery Charge</span>
+                                        <span className="text-lg font-semibold text-gray-900">₹{deliveryCharge}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                                    <span className="text-base font-bold text-gray-800">Total</span>
+                                    <span className="text-2xl font-bold text-gray-900">
+                                        {currentStep === 'payment' && !isCancelled
+                                            ? `₹${totalWithDelivery}`
+                                            : `₹${ordersData.totalAmount}`}
+                                    </span>
+                                </div>
                             </div>
                             <p className="text-xs text-gray-500 text-right">Inclusive of all taxes</p>
 
-                            {/* Cancel button triggers modal */}
+                            {/* Cancel button - only if cancellable */}
                             {canCancel && (
                                 <div className="flex justify-end">
                                     <button
@@ -345,246 +406,373 @@ const PaymentPage = () => {
                     </div>
                 </div>
 
-                {/* ORDER TIMELINE (if payment completed) */}
-                {!isWaiting && (
+                {/* ===== CANCELLED ORDER MESSAGE ===== */}
+                {isCancelled && (
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                         <div className="p-6 sm:p-8">
-                            <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <FaBoxOpen className="text-indigo-500" />
-                                Order Status
-                            </h2>
-                            <div className="relative">
-                                <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded"></div>
-                                <div
-                                    className="absolute top-5 left-0 h-1 bg-indigo-600 rounded transition-all duration-500"
-                                    style={{ width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%` }}
-                                ></div>
-                                <div className="relative flex justify-between">
-                                    {statusSteps.map((step, index) => {
-                                        const Icon = step.icon;
-                                        const isActive = index <= currentStatusIndex;
-                                        const isCurrent = index === currentStatusIndex;
-                                        return (
-                                            <div key={step.key} className="flex flex-col items-center text-center">
-                                                <div
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
-                                                        isActive
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'bg-gray-200 text-gray-500'
-                                                    } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
-                                                >
-                                                    <Icon className="w-5 h-5" />
-                                                </div>
-                                                <span className="text-xs mt-2 font-medium text-gray-700">{step.label}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                                <FaTimesCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                                <h2 className="text-xl font-bold text-gray-900 mb-2">Order Cancelled</h2>
+                                <p className="text-gray-600">
+                                    This order has been cancelled. If you have any questions, please contact support.
+                                </p>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* UPI PAYMENT SECTION (only if waiting) */}
-                {isWaiting && (
+                {/* ===== FOR NON-CANCELLED ORDERS ===== */}
+                {!isCancelled && (
                     <>
-                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                            <div className="p-6 sm:p-8">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                    <FaQrcode className="text-indigo-500" />
-                                    Pay via UPI
-                                </h2>
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm sm:text-base">
-                                                    {paymentInfo?.upiId || 'N/A'}
-                                                </div>
-                                                <button
-                                                    onClick={handleCopy}
-                                                    disabled={!paymentInfo?.upiId}
-                                                    className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative group"
-                                                    title="Copy UPI ID"
-                                                >
-                                                    {copySuccess ? (
-                                                        <FaCheck className="w-5 h-5 text-green-600" />
-                                                    ) : (
-                                                        <BiCopy className="w-5 h-5 text-indigo-600" />
-                                                    )}
-                                                </button>
-                                            </div>
-                                            {copySuccess && <p className="text-sm text-green-600 mt-2 animate-pulse">✓ Copied!</p>}
-                                        </div>
-                                        <p className="text-sm text-gray-500">
-                                            Open your UPI app and send payment to this UPI ID.
-                                        </p>
-                                        {paymentInfo?.accountName && paymentInfo?.bankName && (
-                                            <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-                                                <span className="font-medium">Beneficiary:</span> {paymentInfo.accountName} (
-                                                {paymentInfo.bankName})
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div className="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
-                                            {paymentInfo?.qrImageUrl ? (
-                                                <img
-                                                    src={paymentInfo.qrImageUrl}
-                                                    alt="UPI QR Code"
-                                                    className="w-48 h-48 object-contain rounded-xl"
-                                                />
-                                            ) : (
-                                                <div className="w-48 h-48 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-inner">
-                                                    <span className="text-gray-500 font-medium">QR Code</span>
-                                                </div>
-                                            )}
-                                            <p className="text-sm text-gray-600 text-center mt-4">Scan with any UPI app</p>
+                        {/* ORDER TIMELINE (if payment completed) */}
+                        {!isWaiting && (
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                <div className="p-6 sm:p-8">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                        <FaBoxOpen className="text-indigo-500" />
+                                        Order Status
+                                    </h2>
+                                    <div className="relative">
+                                        <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded"></div>
+                                        <div
+                                            className="absolute top-5 left-0 h-1 bg-indigo-600 rounded transition-all duration-500"
+                                            style={{ width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%` }}
+                                        ></div>
+                                        <div className="relative flex justify-between">
+                                            {statusSteps.map((step, index) => {
+                                                const Icon = step.icon;
+                                                const isActive = index <= currentStatusIndex;
+                                                const isCurrent = index === currentStatusIndex;
+                                                return (
+                                                    <div key={step.key} className="flex flex-col items-center text-center">
+                                                        <div
+                                                            className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${isActive
+                                                                ? 'bg-indigo-600 text-white'
+                                                                : 'bg-gray-200 text-gray-500'
+                                                                } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
+                                                        >
+                                                            <Icon className="w-5 h-5" />
+                                                        </div>
+                                                        <span className="text-xs mt-2 font-medium text-gray-700">{step.label}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                            <div className="p-6 sm:p-8">
-                                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <FiHelpCircle className="w-5 h-5 text-indigo-500" />
-                                    How to pay
-                                </h2>
-                                <ol className="list-decimal list-inside space-y-3 text-gray-700">
-                                    <li>Open your UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
-                                    <li>
-                                        Scan the QR code or send payment to{' '}
-                                        <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">
-                                            {paymentInfo?.upiId || 'N/A'}
-                                        </span>
-                                    </li>
-                                    <li>Complete the payment and copy the UTR / Transaction ID from your app</li>
-                                    <li>Enter the UTR below and submit for verification</li>
-                                </ol>
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                            <div className="p-6 sm:p-8">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">Submit Payment Details</h2>
-                                {submitted ? (
-                                    <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
-                                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <FaCheck className="w-10 h-10 text-green-600" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                            Payment Submitted Successfully
-                                        </h3>
-                                        <p className="text-gray-600 mb-4">
-                                            Your UTR <span className="font-mono bg-white px-2 py-1 rounded">{utr}</span> has been
-                                            received.
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            We'll verify your payment within a few minutes. You'll receive a confirmation once done.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* STEP 1: ADDRESS FORM (only if waiting and address step) */}
+                        {isWaiting && currentStep === 'address' && (
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                <div className="p-6 sm:p-8">
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                        <FaMapMarkerAlt className="text-indigo-500" />
+                                        Shipping Address
+                                    </h2>
+                                    <form onSubmit={handleAddressSubmit} className="space-y-4">
                                         <div>
-                                            <label htmlFor="utr" className="block text-sm font-medium text-gray-700 mb-2">
-                                                UTR / Transaction ID <span className="text-red-500">*</span>
+                                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Full Name <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
-                                                id="utr"
-                                                value={utr}
-                                                onChange={(e) => setUtr(e.target.value)}
+                                                id="fullName"
+                                                name="fullName"
+                                                value={address.fullName}
+                                                onChange={handleAddressChange}
                                                 required
-                                                placeholder="e.g. UPI123456789012"
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             />
                                         </div>
-
                                         <div>
-                                            <label htmlFor="screenshot" className="block text-sm font-medium text-gray-700 mb-2">
-                                                Payment Screenshot (optional)
+                                            <label htmlFor="addressLine" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Address Line <span className="text-red-500">*</span>
                                             </label>
-                                            <div className="flex items-center justify-center w-full">
-                                                <label
-                                                    htmlFor="screenshot"
-                                                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition group"
-                                                >
-                                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <FaUpload className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition" />
-                                                        <p className="text-sm text-gray-500">
-                                                            <span className="font-semibold text-indigo-600">Click to upload</span> or drag and
-                                                            drop
-                                                        </p>
-                                                        <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
-                                                    </div>
-                                                    <input
-                                                        id="screenshot"
-                                                        type="file"
-                                                        accept="image/*"
-                                                        className="hidden"
-                                                        onChange={handleScreenshotChange}
-                                                    />
-                                                </label>
-                                            </div>
-                                            {screenshot && (
-                                                <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
-                                                    <FaCheck className="text-green-500" /> Selected: {screenshot.name}
-                                                </p>
-                                            )}
+                                            <input
+                                                type="text"
+                                                id="addressLine"
+                                                name="addressLine"
+                                                value={address.addressLine}
+                                                onChange={handleAddressChange}
+                                                required
+                                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            />
                                         </div>
-
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    City <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="city"
+                                                    name="city"
+                                                    value={address.city}
+                                                    onChange={handleAddressChange}
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="district" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    District <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="district"
+                                                    name="district"
+                                                    value={address.district}
+                                                    onChange={handleAddressChange}
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    State <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="state"
+                                                    name="state"
+                                                    value={address.state}
+                                                    onChange={handleAddressChange}
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="pincode" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Pincode <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="pincode"
+                                                    name="pincode"
+                                                    value={address.pincode}
+                                                    onChange={handleAddressChange}
+                                                    required
+                                                    pattern="[0-9]{6}"
+                                                    maxLength={6}
+                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                />
+                                            </div>
+                                        </div>
                                         <button
                                             type="submit"
-                                            disabled={!utr || submitting}
-                                            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 mt-4"
                                         >
-                                            {submitting ? (
-                                                <>
-                                                    <FaSpinner className="animate-spin" />
-                                                    Submitting...
-                                                </>
-                                            ) : (
-                                                'Submit Payment'
-                                            )}
+                                            Continue to Payment
                                         </button>
                                     </form>
-                                )}
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* STEP 2: PAYMENT + UTR SUBMISSION (only if waiting and payment step) */}
+                        {isWaiting && currentStep === 'payment' && (
+                            <>
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                    <div className="p-6 sm:p-8">
+                                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                            <FaQrcode className="text-indigo-500" />
+                                            Pay via UPI
+                                        </h2>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm sm:text-base">
+                                                            {paymentInfo?.upiId || 'N/A'}
+                                                        </div>
+                                                        <button
+                                                            onClick={handleCopy}
+                                                            disabled={!paymentInfo?.upiId}
+                                                            className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative group"
+                                                            title="Copy UPI ID"
+                                                        >
+                                                            {copySuccess ? (
+                                                                <FaCheck className="w-5 h-5 text-green-600" />
+                                                            ) : (
+                                                                <BiCopy className="w-5 h-5 text-indigo-600" />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                    {copySuccess && <p className="text-sm text-green-600 mt-2 animate-pulse">✓ Copied!</p>}
+                                                </div>
+                                                <p className="text-sm text-gray-500">
+                                                    Open your UPI app and send payment to this UPI ID.
+                                                </p>
+                                                {paymentInfo?.accountName && paymentInfo?.bankName && (
+                                                    <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                                        <span className="font-medium">Beneficiary:</span> {paymentInfo.accountName} (
+                                                        {paymentInfo.bankName})
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-4">
+                                                <div className="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
+                                                    {paymentInfo?.qrImageUrl ? (
+                                                        <img
+                                                            src={paymentInfo.qrImageUrl}
+                                                            alt="UPI QR Code"
+                                                            className="w-48 h-48 object-contain rounded-xl"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-48 h-48 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-inner">
+                                                            <span className="text-gray-500 font-medium">QR Code</span>
+                                                        </div>
+                                                    )}
+                                                    <p className="text-sm text-gray-600 text-center mt-4">Scan with any UPI app</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                    <div className="p-6 sm:p-8">
+                                        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                            <FiHelpCircle className="w-5 h-5 text-indigo-500" />
+                                            How to pay
+                                        </h2>
+                                        <ol className="list-decimal list-inside space-y-3 text-gray-700">
+                                            <li>Open your UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
+                                            <li>
+                                                Scan the QR code or send payment to{' '}
+                                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">
+                                                    {paymentInfo?.upiId || 'N/A'}
+                                                </span>
+                                            </li>
+                                            <li>Complete the payment and copy the UTR / Transaction ID from your app</li>
+                                            <li>Enter the UTR below and submit for verification</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                    <div className="p-6 sm:p-8">
+                                        <h2 className="text-xl font-bold text-gray-900 mb-6">Submit Payment Details</h2>
+                                        {submitted ? (
+                                            <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+                                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <FaCheck className="w-10 h-10 text-green-600" />
+                                                </div>
+                                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                                    Payment Submitted Successfully
+                                                </h3>
+                                                <p className="text-gray-600 mb-4">
+                                                    Your UTR <span className="font-mono bg-white px-2 py-1 rounded">{utr}</span> has been
+                                                    received.
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    We'll verify your payment within a few minutes. You'll receive a confirmation once done.
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <form onSubmit={handleSubmit} className="space-y-6">
+                                                <div>
+                                                    <label htmlFor="utr" className="block text-sm font-medium text-gray-700 mb-2">
+                                                        UTR / Transaction ID <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="utr"
+                                                        value={utr}
+                                                        onChange={(e) => setUtr(e.target.value)}
+                                                        required
+                                                        placeholder="e.g. UPI123456789012"
+                                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="screenshot" className="block text-sm font-medium text-gray-700 mb-2">
+                                                        Payment Screenshot (optional)
+                                                    </label>
+                                                    <div className="flex items-center justify-center w-full">
+                                                        <label
+                                                            htmlFor="screenshot"
+                                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition group"
+                                                        >
+                                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                                <FaUpload className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 mb-2 transition" />
+                                                                <p className="text-sm text-gray-500">
+                                                                    <span className="font-semibold text-indigo-600">Click to upload</span> or drag and
+                                                                    drop
+                                                                </p>
+                                                                <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+                                                            </div>
+                                                            <input
+                                                                id="screenshot"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={handleScreenshotChange}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                    {screenshot && (
+                                                        <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
+                                                            <FaCheck className="text-green-500" /> Selected: {screenshot.name}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <button
+                                                    type="submit"
+                                                    disabled={!utr || submitting}
+                                                    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+                                                >
+                                                    {submitting ? (
+                                                        <>
+                                                            <FaSpinner className="animate-spin" />
+                                                            Submitting...
+                                                        </>
+                                                    ) : (
+                                                        'Submit Payment'
+                                                    )}
+                                                </button>
+                                            </form>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </>
                 )}
 
-                {/* PAYMENT STATUS CARD */}
+                {/* PAYMENT STATUS CARD (always shown) */}
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                     <div className="p-6 sm:p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Status</h2>
                         <div
-                            className={`rounded-xl p-6 ${
-                                isWaiting
-                                    ? 'bg-amber-50 border border-amber-200'
-                                    : isCompleted
+                            className={`rounded-xl p-6 ${isWaiting
+                                ? 'bg-amber-50 border border-amber-200'
+                                : isCompleted
                                     ? 'bg-green-50 border border-green-200'
                                     : 'bg-red-50 border border-red-200'
-                            }`}
+                                }`}
                         >
                             <div className="flex items-center gap-3 mb-3 flex-wrap">
                                 <span
-                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                        isWaiting
-                                            ? 'bg-amber-200 text-amber-800'
-                                            : isCompleted
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isWaiting
+                                        ? 'bg-amber-200 text-amber-800'
+                                        : isCompleted
                                             ? 'bg-green-200 text-green-800'
                                             : 'bg-red-200 text-red-800'
-                                    }`}
+                                        }`}
                                 >
                                     {isWaiting
                                         ? 'Pending Verification'
                                         : isCompleted
-                                        ? 'Payment Completed'
-                                        : 'Payment Failed'}
+                                            ? 'Payment Completed'
+                                            : 'Payment Failed'}
                                 </span>
                                 {isCompleted && ordersData.payment.utr && (
                                     <span className="text-sm text-gray-600">UTR: {ordersData.payment.utr}</span>
@@ -594,8 +782,8 @@ const PaymentPage = () => {
                                 {isWaiting
                                     ? 'Our team will verify your payment soon. Once verified, your order will be confirmed.'
                                     : isCompleted
-                                    ? 'Your payment has been successfully verified. Thank you for your purchase!'
-                                    : 'There was an issue with your payment. Please contact support.'}
+                                        ? 'Your payment has been successfully verified. Thank you for your purchase!'
+                                        : 'There was an issue with your payment. Please contact support.'}
                             </p>
                         </div>
                     </div>
@@ -656,7 +844,7 @@ const PaymentPage = () => {
                     </div>
                 </div>
 
-                {/* CANCEL ORDER MODAL - with glassy background */}
+                {/* CANCEL ORDER MODAL */}
                 {cancelModalOpen && (
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
