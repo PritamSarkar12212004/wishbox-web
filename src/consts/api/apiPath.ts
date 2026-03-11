@@ -5,6 +5,9 @@ const apiPath = {
   GALLERY: {
     FETCH_GALLERY_DATA: "/gallery/fetch_Gallery_data",
   },
+  PAYMENT_INFO: {
+    FETCH_PAYMENT_INFO_ADMIN: "/payment/fetch_admin_payment_info",
+  },
   CONTACT: {
     FULL_CONTACT: "/contact/full_contact",
   },
@@ -20,6 +23,8 @@ const apiPath = {
     FETCH_ID_CART: "/product/product_fetch_id_cart",
     FETCH_FULL_CART: "/product/product_fetch_full_cart",
     REMOVE_SINGLE_ITEM_CART: "/product/product_remove_single_cart",
+    FAAINAL_UPDATE_CART_WITH_PLACE_ORDER:
+      "/product/product_cart_fainal_update_order_place",
   },
   WATCHLIST: {
     ADD_WATCHLIST: "/product/product_add_watch_list",
@@ -28,6 +33,10 @@ const apiPath = {
   },
   AUTH: {
     CALL_OTP: "/auth/call_otp",
+  },
+  ORDER: {
+    FETCH_FULL_ORDER: "/order/fetch_order_detiles",
+    CANCEL_ORDER: "/order/cancel_order",
   },
 };
 export default apiPath;

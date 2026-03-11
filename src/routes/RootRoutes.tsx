@@ -11,6 +11,8 @@ import ProductCollectionPage from "../page/main/products/ProductCollectionPage";
 import ShowProduct from "../page/main/products/ShowProduct";
 import GaleryPagee from "../page/main/GaleryPagee";
 import CollectionListPage from "../page/main/CollectionListPage";
+import PaymentPage from "../page/main/products/PaymentPage";
+import OrderPage from "../page/main/OrderPage";
 function App() {
     const location = useLocation();
 
@@ -33,6 +35,10 @@ function App() {
                     } element={<CollectionListPage />} />
                     <Route path={routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE
                     } element={<GaleryPagee />} />
+                    <Route path={routePath.PRIVATE_ROUTE.PAYMENT_PAGE
+                    } element={<PaymentPage />} />
+                    <Route path={routePath.PRIVATE_ROUTE.ORDER_PAGE
+                    } element={<OrderPage />} />
                 </Route>
             </Routes>
         </AnimatePresence>

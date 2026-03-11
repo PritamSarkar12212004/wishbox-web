@@ -1,89 +1,72 @@
-import routePath from "../../../consts/routes/routePath"
+import routePath from "../../../consts/routes/routePath";
 
-function DashHeroOne({ navigation }: {
-    navigation: any
-}) {
+function DashHeroOne({ navigation }: { navigation: any }) {
     return (
         <div className='w-full rounded-3xl mt-6 overflow-hidden relative group'>
+            {/* Decorative background circles - smaller on mobile */}
             <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-amber-400 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-rose-400 rounded-full translate-x-1/3 translate-y-1/3"></div>
+                <div className="absolute top-0 left-0 w-32 sm:w-48 md:w-64 h-32 sm:h-48 md:h-64 bg-amber-400 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute bottom-0 right-0 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-rose-400 rounded-full translate-x-1/3 translate-y-1/3"></div>
             </div>
-            <div className="relative z-10 p-8 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div className="space-y-6">
-                    <div className="inline-flex items-center gap-2 bg-linear-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full shadow-lg">
+
+            {/* Main content */}
+            <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
+                {/* Left column */}
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-2 bg-linear-to-r from-amber-500 to-amber-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-lg">
                         <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                        <span className="text-sm font-bold uppercase tracking-wider">Limited Time Offer</span>
+                        <span className="text-xs sm:text-sm font-bold uppercase tracking-wider">Limited Time Offer</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 leading-tight">
+
+                    {/* Heading */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 leading-tight">
                         <span className="bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">
                             Premium Paper
                         </span>
                         <br />
                         <span className="text-neutral-800">Decor Collections</span>
                     </h1>
-                    <p className="text-lg text-neutral-600 max-w-2xl leading-relaxed">
+
+                    {/* Description */}
+                    <p className="text-base sm:text-lg text-neutral-600 max-w-2xl leading-relaxed">
                         Discover our handcrafted sustainable paper decorations that transform ordinary spaces into extraordinary celebrations. Loved by thousands worldwide.
                     </p>
-                    {/* <div className="flex flex-wrap gap-6 pt-4">
-                        <div className="text-center">
-                            <div className="text-3xl font-bold bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">5K+</div>
-                            <div className="text-sm text-neutral-500">Happy Customers</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-3xl font-bold bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">200+</div>
-                            <div className="text-sm text-neutral-500">Unique Designs</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-3xl font-bold bg-linear-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">4.9★</div>
-                            <div className="text-sm text-neutral-500">Average Rating</div>
-                        </div>
-                    </div> */}
-                    <div className="flex flex-wrap gap-4 pt-6">
+
+                    {/* Buttons */}
+                    <div className="flex flex-wrap gap-3 sm:gap-4 pt-4 sm:pt-6">
                         <button
                             onClick={() => navigation(routePath.PRIVATE_ROUTE.SHOP_PAGE)}
-                            className="group/btn relative cursor-pointer px-8 py-4 rounded-2xl font-bold text-white bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3"
+                            className="group/btn relative cursor-pointer px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-white bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2 sm:gap-3 text-sm sm:text-base"
                         >
                             Shop Collection
                             <svg
-                                className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1"
+                                className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover/btn:translate-x-1"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
-                            <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                            <div className="absolute inset-0 overflow-hidden rounded-xl sm:rounded-2xl">
                                 <div className="absolute -inset-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-shine"></div>
                             </div>
                         </button>
 
                         <button
                             onClick={() => navigation(routePath.PRIVATE_ROUTE.COLLECTIONIMG_PAGE)}
-                            className="px-8 py-4 rounded-2xl cursor-pointer font-bold text-neutral-700 border-2 border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-3"
+                            className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl cursor-pointer font-bold text-neutral-700 border-2 border-amber-400 hover:bg-amber-50 transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3 text-sm sm:text-base"
                         >
                             View Gallery
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </button>
                     </div>
-
-                    {/* <div className="flex items-center gap-4 pt-8">
-                        <div className="flex -space-x-2">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div
-                                    key={i}
-                                    className="w-8 h-8 rounded-full border-2 border-white bg-linear-to-br from-amber-400 to-rose-400"
-                                ></div>
-                            ))}
-                        </div>
-                        <div className="text-sm text-neutral-600">
-                            <span className="font-semibold">Join 5,000+</span> satisfied customers
-                        </div>
-                    </div> */}
                 </div>
-                <div className="relative">
+
+                {/* Right column - image with floating badges */}
+                <div className="relative mt-4 sm:mt-6 lg:mt-0">
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl transform group-hover:rotate-1 transition-transform duration-700">
                         <img
                             src="/src/assets/images/premium_paper_decoration.png"
@@ -92,26 +75,34 @@ function DashHeroOne({ navigation }: {
                             style={{ aspectRatio: '4/3' }}
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent"></div>
-                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold text-amber-700 shadow-lg">
+                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-amber-700 shadow-lg">
                             🔥 Best Seller
                         </div>
                     </div>
-                    <div className="absolute -top-4 -left-4 w-24 h-24 bg-linear-to-br from-amber-400/20 to-rose-400/20 rounded-2xl -rotate-12 group-hover:rotate-0 transition-transform duration-700"></div>
-                    <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-linear-to-br from-rose-400/20 to-amber-400/20 rounded-3xl rotate-12 group-hover:rotate-0 transition-transform duration-700"></div>
-                    <div className="absolute -bottom-4 left-8 bg-white shadow-xl rounded-xl p-3 transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
+
+                    {/* Decorative background shapes */}
+                    <div className="absolute -top-4 -left-4 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-linear-to-br from-amber-400/20 to-rose-400/20 rounded-2xl -rotate-12 group-hover:rotate-0 transition-transform duration-700"></div>
+                    <div className="absolute -bottom-6 -right-6 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-linear-to-br from-rose-400/20 to-amber-400/20 rounded-3xl rotate-12 group-hover:rotate-0 transition-transform duration-700"></div>
+
+                    {/* Floating discount badge */}
+                    <div className="absolute -bottom-4 left-2 sm:left-4 md:left-8 bg-white shadow-xl rounded-lg sm:rounded-xl p-2 sm:p-3 transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-amber-600">40% OFF</div>
-                            <div className="text-xs text-neutral-500">Today Only</div>
+                            <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">40% OFF</div>
+                            <div className="text-[10px] sm:text-xs text-neutral-500">Today Only</div>
                         </div>
                     </div>
-                    <div className="absolute top-1/4 -right-4 bg-linear-to-r from-rose-500 to-amber-500 text-white shadow-xl rounded-xl p-3 transform rotate-3 group-hover:rotate-0 transition-transform duration-500">
+
+                    {/* Free shipping badge */}
+                    <div className="absolute top-1/4 -right-2 sm:-right-4 bg-linear-to-r from-rose-500 to-amber-500 text-white shadow-xl rounded-lg sm:rounded-xl p-2 sm:p-3 transform rotate-3 group-hover:rotate-0 transition-transform duration-500">
                         <div className="text-center">
-                            <div className="font-bold">Free</div>
-                            <div className="text-xs">Shipping</div>
+                            <div className="font-bold text-xs sm:text-sm">Free</div>
+                            <div className="text-[10px] sm:text-xs">Shipping</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Wave decoration */}
             <div className="absolute bottom-0 left-0 right-0 h-6 overflow-hidden">
                 <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-amber-50/50 to-transparent"></div>
                 <svg className="relative w-full h-12" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -125,6 +116,8 @@ function DashHeroOne({ navigation }: {
                         className="fill-amber-100"></path>
                 </svg>
             </div>
+
+            {/* Sparkles */}
             <div className="absolute inset-0 overflow-hidden opacity-30">
                 {[...Array(12)].map((_, i) => (
                     <div
@@ -140,7 +133,7 @@ function DashHeroOne({ navigation }: {
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
-export default DashHeroOne
+export default DashHeroOne;

@@ -3,7 +3,6 @@ import type { TypeCollection } from "../../types/collections/typeCollection";
 import routePath from "../../consts/routes/routePath";
 
 function MainProductCard({ item, index }: { item: TypeCollection; index: number }) {
-
   const rating = 4.2;
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
@@ -25,7 +24,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
       {/* Theme background overlay */}
       <div
         className="absolute inset-0 opacity-5 transition-opacity group-hover:opacity-10"
-        style={{ backgroundColor: item.theme.secondaryColor }}
+        style={{ backgroundColor: item.theme?.secondaryColor || "" }}
         aria-hidden="true"
       />
 
@@ -45,7 +44,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
           </div>
           <span
             className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs font-bold rounded-full text-white shadow-sm flex-shrink-0"
-            style={{ backgroundColor: item.theme.secondaryColor }}
+            style={{ backgroundColor: item.theme?.secondaryColor || "" }}
             aria-label={`${item.totalProducts} products`}
           >
             {item.totalProducts}+
@@ -57,7 +56,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
       <div className="relative px-3 sm:px-4 md:px-6">
         <div
           className="relative overflow-hidden rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg transition-shadow duration-500"
-          style={{ backgroundColor: item.theme.secondaryColor }}
+          style={{ backgroundColor: item.theme?.secondaryColor || "" }}
         >
           <div
             className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent z-10"
@@ -80,7 +79,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
           >
             <svg
               className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5"
-              style={{ color: item.theme.secondaryColor }}
+              style={{ color: item.theme?.secondaryColor || "" }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -148,8 +147,8 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
           <span
             className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 inline-flex items-center gap-1 sm:gap-2 group-hover:shadow-md group-hover:scale-105"
             style={{
-              backgroundColor: item.theme.secondaryColor,
-              color: item.theme.primaryColor,
+              backgroundColor: item.theme?.secondaryColor || "",
+              color: item.theme?.primaryColor || "",
             }}
             aria-hidden="true"
           >
@@ -175,7 +174,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
       {/* Decorative corner accent */}
       <div
         className="absolute top-0 right-0 w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-bl-xl sm:rounded-bl-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500"
-        style={{ backgroundColor: item.theme.secondaryColor }}
+        style={{ backgroundColor: item.theme?.secondaryColor || "" }}
         aria-hidden="true"
       />
     </button>

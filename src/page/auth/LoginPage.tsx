@@ -35,6 +35,73 @@ import { useDispatch, useSelector } from 'react-redux';
 import ApiOtpVarify from '../../api/auth/ApiOtpVarify';
 import ApiOtp from '../../api/auth/ApiOtp';
 import { mainLoaderTogel } from '../../services/store/slice/loading/loadingSlice';
+
+// ------------------ Wish Box Color Tokens ------------------
+const amber = {
+    50: '#fffbeb',
+    100: '#fef3c7',
+    500: '#f59e0b',   // primary
+    600: '#d97706',   // primary dark
+};
+
+const gray = {
+    50: '#f9fafb',
+    100: '#f3f4f6',
+    200: '#e5e7eb',
+    300: '#d1d5db',
+    400: '#9ca3af',
+    500: '#6b7280',
+    600: '#4b5563',   // text secondary
+    900: '#111827',   // text primary
+};
+
+// ------------------ Styled Components ------------------
+// Glassmorphism card for the login form
+const GlassPaper = styled(Paper)(({ theme }) => ({
+    background: 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)', // for Safari
+    border: `1px solid rgba(255, 255, 255, 0.3)`,
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    borderRadius: 24, // rounded-2xl
+    position: 'relative',
+    overflow: 'hidden',
+    // subtle inner glow
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `radial-gradient(circle at 20% 30%, ${amber[100]}40, transparent 70%)`,
+        pointerEvents: 'none',
+    },
+}));
+
+const GradientButton = styled(Button)(({ theme }) => ({
+    background: `linear-gradient(135deg, ${amber[500]} 0%, ${amber[600]} 100%)`,
+    borderRadius: 12, // rounded-xl
+    padding: '10px 22px',
+    transition: 'all 0.3s ease',
+    color: '#ffffff',
+    fontWeight: 500,
+    textTransform: 'none',
+    '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: `0 8px 20px ${amber[500]}40`,
+        background: `linear-gradient(135deg, ${amber[600]} 0%, ${amber[500]} 100%)`,
+    },
+    '&:active': {
+        transform: 'translateY(0)',
+    },
+    '&.Mui-disabled': {
+        background: gray[200],
+        color: gray[400],
+    },
+}));
+
+// ------------------ Validation Schemas (unchanged) ------------------
 const phoneSchema = yup.object({
     phoneNumber: yup
         .string()
@@ -50,51 +117,10 @@ const otpSchema = yup.object({
         .matches(/^[0-9]{6}$/, 'Enter 6-digit OTP'),
 });
 
-type PhoneFormData = {
-    phoneNumber: string;
-};
+type PhoneFormData = { phoneNumber: string };
+type OtpFormData = { otp: string };
 
-type OtpFormData = {
-    otp: string;
-};
-
-// Optimized styled components without backdrop filter
-const GradientPaper = styled(Paper)(({ theme }) => ({
-    background: `linear-gradient(145deg, 
-        ${theme.palette.background.paper} 0%, 
-        ${theme.palette.background.default} 100%
-    )`,
-    border: `1px solid ${theme.palette.divider}`,
-    boxShadow: theme.shadows[8],
-    position: 'relative',
-    overflow: 'hidden',
-    '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: `linear-gradient(45deg, transparent 65%, rgba(102, 126, 234, 0.05) 65%, rgba(102, 126, 234, 0.1) 100%)`,
-        pointerEvents: 'none',
-    },
-}));
-
-const GradientButton = styled(Button)(({ theme }) => ({
-    background: `linear-gradient(135deg, 
-        ${theme.palette.primary.main} 0%, 
-        ${theme.palette.primary.dark} 100%
-    )`,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: `0 8px 25px ${theme.palette.primary.main}40`,
-    },
-    '&:active': {
-        transform: 'translateY(0)',
-    },
-}));
-
+// ------------------ Main Component ------------------
 const LoginPage = () => {
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -113,8 +139,7 @@ const LoginPage = () => {
         setValue: setPhoneValue,
     } = useForm<PhoneFormData>({
         resolver: yupResolver(phoneSchema),
-        defaultValues: {
-        },
+        defaultValues: {},
     });
 
     const {
@@ -124,11 +149,15 @@ const LoginPage = () => {
         reset: resetOtp,
     } = useForm<OtpFormData>({
         resolver: yupResolver(otpSchema),
-        defaultValues: {
-            otp: '',
-        },
+        defaultValues: { otp: '' },
     });
 
+    // Redux state (unchanged)
+    const phoneFromStore = useSelector((state: any) => state.auth.PhoneNumber);
+    const otpFromStore = useSelector((state: any) => state.auth.OneTimePasssword);
+    const id = useSelector((state: any) => state.userDataSlice.tempUserID);
+
+    // Helper functions (unchanged)
     const formatPhoneNumber = (value: string) => {
         const cleaned = value.replace(/\D/g, '');
         if (cleaned.length <= 3) return cleaned;
@@ -137,8 +166,10 @@ const LoginPage = () => {
     };
 
     const handleSendOtp = async (data: PhoneFormData) => {
-        await ApiOtp({ phone: data.phoneNumber, dispatch: dispatch })
+        setIsLoading(true);
+        setError('');
         try {
+            await ApiOtp({ phone: data.phoneNumber, dispatch });
             setStep('otp');
             setResendTimer(30);
             setShowResend(false);
@@ -158,8 +189,6 @@ const LoginPage = () => {
             setIsLoading(false);
         }
     };
-    const phoneFromStore = useSelector((state: any) => state.auth.PhoneNumber);
-    const otpFromStore = useSelector((state: any) => state.auth.OneTimePasssword);
 
     const handleResendOtp = async () => {
         if (!showResend) return;
@@ -167,8 +196,7 @@ const LoginPage = () => {
         setError('');
         setSuccess('');
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            await ApiOtp({ phone: phoneFromStore, dispatch: dispatch })
+            await ApiOtp({ phone: phoneFromStore, dispatch });
             setResendTimer(30);
             setShowResend(false);
             const timer = setInterval(() => {
@@ -181,7 +209,6 @@ const LoginPage = () => {
                     return prev - 1;
                 });
             }, 1000);
-
         } catch (err) {
             setError('Failed to resend code. Please try again.');
         } finally {
@@ -189,17 +216,16 @@ const LoginPage = () => {
         }
     };
 
-    const id = useSelector((state: any) => state.userDataSlice.tempUserID)
     const handleVerifyOtp = async (data: OtpFormData) => {
         setIsLoading(true);
         setError('');
         try {
             ApiOtpVarify({
-                dispatch: dispatch,
+                dispatch,
                 storeOpt: otpFromStore,
                 userOtp: data.otp,
-                id: id
-            })
+                id,
+            });
         } catch (err) {
             setError('Invalid verification code. Please try again.');
             resetOtp({ otp: '' });
@@ -214,25 +240,26 @@ const LoginPage = () => {
         setSuccess('');
         resetOtp({ otp: '' });
     };
+
     useEffect(() => {
-        dispatch(mainLoaderTogel(false))
-    }, [])
+        dispatch(mainLoaderTogel(false));
+    }, [dispatch]);
+
+    // ------------------ Brand Showcase (Wish Box) ------------------
     const BrandShowcase = () => (
-        <Box sx={{
-            flex: { lg: 0.4 },
-            display: { xs: 'none', lg: 'flex' },
-            flexDirection: 'column',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.primary.dark,
-            background: `linear-gradient(135deg, 
-                ${theme.palette.primary.dark} 0%, 
-                ${theme.palette.primary.main} 100%
-            )`,
-            p: { lg: 6, xl: 8 },
-            position: 'relative',
-            overflow: 'hidden',
-        }}>
-            {/* Decorative elements without animation */}
+        <Box
+            sx={{
+                flex: { lg: 0.4 },
+                display: { xs: 'none', lg: 'flex' },
+                flexDirection: 'column',
+                justifyContent: 'center',
+                background: `linear-gradient(135deg, ${amber[600]} 0%, ${amber[500]} 100%)`,
+                p: { lg: 6, xl: 8 },
+                position: 'relative',
+                overflow: 'hidden',
+            }}
+        >
+            {/* Decorative overlay */}
             <Box
                 sx={{
                     position: 'absolute',
@@ -245,114 +272,69 @@ const LoginPage = () => {
                 }}
             />
 
-            <Box sx={{
-                position: 'relative',
-                zIndex: 1,
-                color: 'white',
-                maxWidth: 500,
-                width: '100%',
-            }}>
-                {/* Brand Header */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    color: 'white',
+                    maxWidth: 500,
+                    width: '100%',
+                }}
+            >
+                {/* Brand Header - Wish Box */}
                 <Box sx={{ mb: 4, textAlign: 'center' }}>
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mb: 2,
-                    }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                         <Diamond sx={{ fontSize: 40, mr: 2 }} />
                         <Typography variant="h3" fontWeight="bold">
-                            ArtisanDecor
+                            Wish Box
                         </Typography>
                     </Box>
                     <Typography variant="h5" sx={{ opacity: 0.9 }}>
-                        Premium Home Decor & Lifestyle
+                        Premium Gifts & Decor
                     </Typography>
                 </Box>
 
-                <Divider sx={{
-                    my: 4,
-                    backgroundColor: 'rgba(255,255,255,0.2)'
-                }} />
+                <Divider sx={{ my: 4, backgroundColor: 'rgba(255,255,255,0.2)' }} />
 
-                {/* Features Grid - Fixed with stable rendering */}
+                {/* Features Grid */}
                 <Grid container spacing={3}>
-                    <Grid size={12}>
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            p: 2,
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(255,255,255,0.1)',
-                        }}>
-                            <CheckCircle sx={{ mr: 2, fontSize: 30 }} />
-                            <Box>
-                                <Typography variant="subtitle1" fontWeight="medium">
-                                    Handcrafted Premium Quality
-                                </Typography>
-                                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                                    Artisan-made products
-                                </Typography>
+                    {[
+                        { icon: CheckCircle, title: 'Handcrafted with Love', subtitle: 'Unique artisan pieces' },
+                        { icon: Security, title: 'Secure Checkout', subtitle: '256‑bit encryption' },
+                        { icon: Verified, title: 'Curated Collections', subtitle: 'Expertly selected' },
+                    ].map((feature, idx) => (
+                        <Grid size={12} key={idx}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    p: 2,
+                                    backgroundColor: 'rgba(255,255,255,0.05)',
+                                    borderRadius: 2,
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                }}
+                            >
+                                <feature.icon sx={{ mr: 2, fontSize: 30 }} />
+                                <Box>
+                                    <Typography variant="subtitle1" fontWeight="medium">
+                                        {feature.title}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                                        {feature.subtitle}
+                                    </Typography>
+                                </Box>
                             </Box>
-                        </Box>
-                    </Grid>
-
-                    <Grid size={12}>
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            p: 2,
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(255,255,255,0.1)',
-                        }}>
-                            <Security sx={{ mr: 2, fontSize: 30 }} />
-                            <Box>
-                                <Typography variant="subtitle1" fontWeight="medium">
-                                    Secure Transactions
-                                </Typography>
-                                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                                    256-bit encryption
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Grid>
-
-                    <Grid size={12}>
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            p: 2,
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(255,255,255,0.1)',
-                        }}>
-                            <Verified sx={{ mr: 2, fontSize: 30 }} />
-                            <Box>
-                                <Typography variant="subtitle1" fontWeight="medium">
-                                    Verified Sellers
-                                </Typography>
-                                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                                    Quality assurance
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Grid>
+                        </Grid>
+                    ))}
                 </Grid>
 
-                {/* Quote Section */}
-                <Box sx={{
-                    mt: 6,
-                    pt: 4,
-                    borderTop: '1px solid rgba(255,255,255,0.1)',
-                }}>
-                    <Typography variant="body2" sx={{
-                        fontStyle: 'italic',
-                        opacity: 0.9,
-                        textAlign: 'center',
-                    }}>
-                        "Transforming spaces with premium decor since 2015"
+                {/* Quote */}
+                <Box sx={{ mt: 6, pt: 4, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <Typography
+                        variant="body2"
+                        sx={{ fontStyle: 'italic', opacity: 0.9, textAlign: 'center' }}
+                    >
+                        "Bringing your wishes to life, one gift at a time."
                     </Typography>
                 </Box>
             </Box>
@@ -360,53 +342,63 @@ const LoginPage = () => {
     );
 
     return (
-        <Box sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.background.default,
-            py: { xs: 2, md: 4 },
-            px: { xs: 1, sm: 2 },
-        }}>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: `radial-gradient(circle at 10% 30%, ${amber[100]} 0%, ${gray[50]} 90%)`,
+                py: { xs: 2, md: 4 },
+                px: { xs: 1, sm: 2 },
+            }}
+        >
             <Container maxWidth="xl">
                 <Fade in={true} timeout={500}>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', lg: 'row' },
-                        minHeight: { xs: 'auto', lg: '600px' },
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        boxShadow: theme.shadows[4],
-                        width: '100%',
-                        maxWidth: 1200,
-                        margin: '0 auto',
-                    }}>
-                        {/* Left Side - Brand Showcase */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', lg: 'row' },
+                            minHeight: { xs: 'auto', lg: '600px' },
+                            borderRadius: 4,
+                            overflow: 'hidden',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                            width: '100%',
+                            maxWidth: 1200,
+                            margin: '0 auto',
+                        }}
+                    >
+                        {/* Left - Brand Showcase */}
                         <BrandShowcase />
 
-                        {/* Right Side - Login Form */}
-                        <GradientPaper sx={{
-                            flex: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            p: { xs: 3, sm: 4, md: 5, lg: 6 },
-                        }}>
-                            {/* Progress Stepper */}
+                        {/* Right - Glassmorphism Login Form */}
+                        <GlassPaper
+                            sx={{
+                                flex: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                p: { xs: 3, sm: 4, md: 5, lg: 6 },
+                            }}
+                        >
+                            {/* Progress Stepper with amber accent */}
                             <Stepper
                                 activeStep={step === 'phone' ? 0 : 1}
-                                sx={{ mb: 4 }}
+                                sx={{
+                                    mb: 4,
+                                    '& .MuiStepIcon-root.Mui-active': { color: amber[500] },
+                                    '& .MuiStepIcon-root.Mui-completed': { color: amber[600] },
+                                }}
                             >
                                 <Step>
                                     <StepLabel>
-                                        <Typography variant="caption">
+                                        <Typography variant="caption" sx={{ color: gray[600] }}>
                                             Phone Number
                                         </Typography>
                                     </StepLabel>
                                 </Step>
                                 <Step>
                                     <StepLabel>
-                                        <Typography variant="caption">
+                                        <Typography variant="caption" sx={{ color: gray[600] }}>
                                             Verification
                                         </Typography>
                                     </StepLabel>
@@ -414,41 +406,42 @@ const LoginPage = () => {
                             </Stepper>
 
                             {/* Form Content */}
-                            <Box sx={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                maxWidth: 450,
-                                mx: 'auto',
-                                width: '100%',
-                            }}>
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    maxWidth: 450,
+                                    mx: 'auto',
+                                    width: '100%',
+                                }}
+                            >
                                 {/* Header */}
                                 <Box sx={{ textAlign: 'center', mb: 4 }}>
                                     <Typography
                                         variant="h4"
                                         fontWeight="bold"
                                         gutterBottom
-                                        color="primary"
+                                        sx={{ color: amber[500] }}
                                     >
                                         {step === 'phone' ? 'Welcome Back' : 'Secure Login'}
                                     </Typography>
-                                    <Typography variant="body1" color="text.secondary">
+                                    <Typography variant="body1" sx={{ color: gray[600] }}>
                                         {step === 'phone'
                                             ? 'Enter your phone number to continue'
-                                            : `Enter verification code sent to ${phoneNumber}`
-                                        }
+                                            : `Enter verification code sent to ${phoneNumber}`}
                                     </Typography>
                                 </Box>
 
                                 {/* Messages */}
                                 {error && (
-                                    <Alert severity="error" sx={{ mb: 3 }}>
+                                    <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                                         {error}
                                     </Alert>
                                 )}
                                 {success && (
-                                    <Alert severity="success" sx={{ mb: 3 }}>
+                                    <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
                                         {success}
                                     </Alert>
                                 )}
@@ -480,6 +473,14 @@ const LoginPage = () => {
                                                                 +91
                                                             </InputAdornment>
                                                         ),
+                                                        sx: {
+                                                            borderRadius: 2,
+                                                            backgroundColor: 'rgba(255,255,255,0.8)',
+                                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                                borderColor: amber[500],
+                                                                borderWidth: 2,
+                                                            },
+                                                        },
                                                     }}
                                                     sx={{ mb: 3 }}
                                                 />
@@ -496,15 +497,11 @@ const LoginPage = () => {
                                         >
                                             {isLoading ? (
                                                 <>
-                                                    <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                    <p className='text-white'>
-                                                        Sending Code...
-                                                    </p>
+                                                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                                                    Sending Code...
                                                 </>
                                             ) : (
-                                                <p className='text-white'>
-                                                    Continue with OTP
-                                                </p>
+                                                'Continue with OTP'
                                             )}
                                         </GradientButton>
                                     </form>
@@ -517,7 +514,7 @@ const LoginPage = () => {
                                             <IconButton
                                                 onClick={handleBackToPhone}
                                                 disabled={isLoading}
-                                                sx={{ color: 'primary.main' }}
+                                                sx={{ color: amber[500], '&:hover': { backgroundColor: amber[50] } }}
                                             >
                                                 <ArrowBack />
                                                 <Typography variant="body2" sx={{ ml: 1 }}>
@@ -545,12 +542,20 @@ const LoginPage = () => {
                                                             maxLength: 6,
                                                             inputMode: 'numeric',
                                                             pattern: '[0-9]*',
-                                                        }}
-                                                        InputProps={{
                                                             sx: {
                                                                 fontSize: '1.5rem',
                                                                 letterSpacing: '8px',
                                                                 textAlign: 'center',
+                                                            },
+                                                        }}
+                                                        InputProps={{
+                                                            sx: {
+                                                                borderRadius: 2,
+                                                                backgroundColor: 'rgba(255,255,255,0.8)',
+                                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                                    borderColor: amber[500],
+                                                                    borderWidth: 2,
+                                                                },
                                                             },
                                                         }}
                                                     />
@@ -559,7 +564,7 @@ const LoginPage = () => {
 
                                             <Box sx={{ textAlign: 'center', my: 3 }}>
                                                 {!showResend ? (
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography variant="body2" sx={{ color: gray[500] }}>
                                                         Resend code in {resendTimer}s
                                                     </Typography>
                                                 ) : (
@@ -567,6 +572,10 @@ const LoginPage = () => {
                                                         onClick={handleResendOtp}
                                                         disabled={isLoading}
                                                         startIcon={<Send />}
+                                                        sx={{
+                                                            color: amber[500],
+                                                            '&:hover': { backgroundColor: amber[50] },
+                                                        }}
                                                     >
                                                         Resend Code
                                                     </Button>
@@ -578,23 +587,26 @@ const LoginPage = () => {
                                                 fullWidth
                                                 size="large"
                                                 disabled={isLoading}
-                                                startIcon={isLoading && <CircularProgress size={20} />}
+                                                startIcon={isLoading && <CircularProgress size={20} sx={{ color: 'white' }} />}
                                             >
-                                                {isLoading ? <p className='text-white'>Verifying... </p> : <p className='text-white'>Verify & Login</p>}
+                                                {isLoading ? 'Verifying...' : 'Verify & Login'}
                                             </GradientButton>
                                         </form>
                                     </>
                                 )}
 
                                 {/* Footer */}
-                                <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
-                                    <Typography variant="caption" color="text.secondary" align="center" display="block">
-                                        <Security sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                                <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: gray[200] }}>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ color: gray[500], display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
+                                        <Security sx={{ fontSize: 14, mr: 0.5 }} />
                                         Secured with enterprise-grade encryption
                                     </Typography>
                                 </Box>
                             </Box>
-                        </GradientPaper>
+                        </GlassPaper>
                     </Box>
                 </Fade>
             </Container>

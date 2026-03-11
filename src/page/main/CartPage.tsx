@@ -7,9 +7,12 @@ import { mainLoaderTogel } from '../../services/store/slice/loading/loadingSlice
 import ApiCallRemoveSingleItem from '../../api/cart/ApiCallRemoveSingleItem';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import routePath from '../../consts/routes/routePath';
+import ApiCallFainalUpdateCart from '../../api/cart/ApiCallFainalUpdateCart';
+
 function CartPage() {
-  const data: any = useSelector((state: any) => state.cartDataSlice.cartData)
-  const userID = useSelector((state: any) => state.userDataSlice.mainUserID)
+  const data: any = useSelector((state: any) => state.cartDataSlice.cartData);
+  const userID = useSelector((state: any) => state.userDataSlice.mainUserID);
   type CartItem = {
     _id: any;
     image: string;
@@ -19,55 +22,64 @@ function CartPage() {
     title: string;
   };
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const navigateCeckout = () => {
-    dispatch(mainLoaderTogel(true))
-  }
-  const [removeLoading, setRemoveLoading] = useState<boolean>(false)
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const navigateCheckout = async () => {
+    dispatch(mainLoaderTogel(true));
+    await ApiCallFainalUpdateCart({
+      dispatch: dispatch,
+      data: cartItems,
+      userID: userID,
+      navigate: navigate
+
+    })
+  };
+
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 20) return;
     setCartItems(items =>
-      items.map(item =>
-        item._id === id
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
+      items.map(item => (item._id === id ? { ...item, quantity: newQuantity } : item))
     );
   };
+
   const removeFun = (id: any) => {
-    setCartItems(items =>
-      items.filter(item => item._id !== id)
-    );
-  }
+    setCartItems(items => items.filter(item => item._id !== id));
+  };
+
   const removeItem = async (id: string) => {
-    setRemoveLoading(true)
+    setRemovingId(id);
     const data = {
       item: id,
-      userId: userID
+      userId: userID,
     };
     ApiCallRemoveSingleItem({
       data: data,
       dispatch: dispatch,
       removeFun: removeFun,
-      setRemoveLoading
-    })
-
-
+      setRemoveLoading: (loading: boolean) => {
+        if (!loading) setRemovingId(null); // clear spinner
+      },
+    });
   };
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = subtotal > 3000 ? 0 : 99;
   const total = subtotal;
 
-  const dispatch = useDispatch()
   useEffect(() => {
     APiCallFetchFullCart({
       dispatch: dispatch,
-      id: userID
-    })
-  }, [])
+      id: userID,
+    });
+  }, []);
+
   useEffect(() => {
     setCartItems(data || []);
   }, [data]);
+
   return (
     <ScrollReveal>
       <div className="min-h-screen bg-gray-50">
@@ -92,12 +104,9 @@ function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {/* Cart Items Section */}
             <div className="lg:col-span-2">
-              {/* Cart Items List */}
               <div className="bg-white rounded-lg sm:rounded-xl shadow-sm sm:shadow-md overflow-hidden border border-gray-200">
                 <div className="p-3 sm:p-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-base sm:text-lg font-bold text-gray-900">Your Cart Items</h2>
-                  </div>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900">Your Cart Items</h2>
                 </div>
 
                 {cartItems.length === 0 ? (
@@ -118,97 +127,90 @@ function CartPage() {
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100">
-                    {cartItems.map((item) => (
-                      <div key={item._id} className="p-3 sm:p-4 hover:bg-gray-50/50 transition-colors duration-200">
-                        <div className="flex gap-3 sm:gap-4">
-                          {/* Product Image - Fixed aspect ratio */}
-                          <div className="flex-shrink-0">
-                            <div className="relative">
-                              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-gray-100">
-                                <img
-                                  src={item.image}
-                                  alt={item.title}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                />
-                              </div>
-                              <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full">
-                                -{Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}%
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Product Details - Takes remaining space */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col h-full">
-                              {/* Top row: Title and Remove button */}
-                              <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-1">{item.title}</h3>
-                                  {/* <p className="text-xs text-gray-600 mb-1">Category: {item.category}</p> */}
+                    {cartItems.map(item => {
+                      const saving = item.originalPrice - item.price;
+                      const savingPercent = Math.round((saving / item.originalPrice) * 100);
+                      return (
+                        <div key={item._id} className="p-3 sm:p-4 hover:bg-gray-50/50 transition-colors duration-200">
+                          <div className="flex gap-3 sm:gap-4">
+                            {/* Product Image */}
+                            <div className="flex-shrink-0">
+                              <div className="relative">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-gray-100">
+                                  <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                  />
                                 </div>
-                                <button
-                                  onClick={() => removeItem(item._id)}
-                                  className="p-1 text-gray-400 cursor-pointer hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                                >
-                                  {
-                                    removeLoading ? <Box sx={{ display: 'flex' }}>
-                                      <CircularProgress size={15} color='info' />
-                                    </Box>
-                                      : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full">
+                                  -{savingPercent}%
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Product Details */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col h-full">
+                                {/* Top row: Title and Remove button */}
+                                <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-1">
+                                      {item.title}
+                                    </h3>
+                                  </div>
+                                  <button
+                                    onClick={() => removeItem(item._id)}
+                                    disabled={removingId === item._id}
+                                    className="p-1 text-gray-400 cursor-pointer hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {removingId === item._id ? (
+                                      <Box sx={{ display: 'flex' }}>
+                                        <CircularProgress size={15} color="info" />
+                                      </Box>
+                                    ) : (
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                       </svg>
-                                  }
-                                </button>
-                              </div>
-
-                              {/* Middle row: Color and Delivery info */}
-                              {/* <div className="flex items-center gap-3 mb-2 sm:mb-3">
-                                <span className="flex items-center gap-1 text-xs text-gray-500">
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                  </svg>
-                                  {item.color}
-                                </span>
-                                <span className="flex items-center gap-1 text-xs text-gray-500">
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                  </svg>
-                                  {item.delivery}
-                                </span>
-                              </div> */}
-
-                              {/* Bottom row: Quantity, Delivery estimate, and Price */}
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex items-center bg-gray-100 rounded-full">
-                                    <button
-                                      onClick={() => updateQuantity(item._id, item.quantity - 20)}
-                                      className="p-1.5 text-gray-600 hover:text-amber-600"
-                                    >
-                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                      </svg>
-                                    </button>
-                                    <span className="w-8 text-center font-medium text-gray-900 text-sm">{item.quantity}</span>
-                                    <button
-                                      onClick={() => updateQuantity(item._id, item.quantity + 20)}
-                                      className="p-1.5 text-gray-600 hover:text-amber-600"
-                                    >
-                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                      </svg>
-                                    </button>
-                                  </div>
+                                    )}
+                                  </button>
                                 </div>
 
-                                <div className="flex items-center justify-between sm:justify-end gap-3">
-                                  <div className="text-right">
-                                    <div className="text-base sm:text-lg font-bold text-gray-900">₹{item.price * item.quantity}</div>
-                                    <div className="flex items-center gap-1 text-xs">
-                                      <span className="text-gray-400 line-through">₹{item.price * item.quantity}</span>
-                                      <span className="text-green-600 font-medium">
-                                        Save ₹{(item.price - item.price) * item.quantity}
-                                      </span>
+                                {/* Bottom row: Quantity and Price */}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-auto">
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex items-center bg-gray-100 rounded-full">
+                                      <button
+                                        onClick={() => updateQuantity(item._id, item.quantity - 20)}
+                                        className="p-1.5 text-gray-600 hover:text-amber-600"
+                                      >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                        </svg>
+                                      </button>
+                                      <span className="w-8 text-center font-medium text-gray-900 text-sm">{item.quantity}</span>
+                                      <button
+                                        onClick={() => updateQuantity(item._id, item.quantity + 20)}
+                                        className="p-1.5 text-gray-600 hover:text-amber-600"
+                                      >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                                    <div className="text-right">
+                                      <div className="text-base sm:text-lg font-bold text-gray-900">
+                                        ₹{item.price * item.quantity}
+                                      </div>
+                                      <div className="flex items-center gap-1 text-xs">
+                                        <span className="text-gray-400 line-through">
+                                          ₹{item.originalPrice * item.quantity}
+                                        </span>
+                                        <span className="text-green-600 font-medium">Save ₹{saving * item.quantity}</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -216,8 +218,8 @@ function CartPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
@@ -234,9 +236,11 @@ function CartPage() {
                         </svg>
                         Continue Shopping
                       </button>
-                      <div className="text-xs text-gray-600">
-                        Need help? <a href="#" className="text-amber-600 hover:underline">Contact Support</a>
-                      </div>
+                      <button onClick={() => navigate(routePath.PRIVATE_ROUTE.SUPPORT_PAGE)}>
+                        <div className="text-xs text-gray-600">
+                          Need help? <a href="#" className="text-amber-600 hover:underline">Contact Support</a>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -261,11 +265,7 @@ function CartPage() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Shipping</span>
                         <span className="font-medium text-gray-900">
-                          {shipping === 0 ? (
-                            <span className="text-green-600">Free</span>
-                          ) : (
-                            `₹${shipping}`
-                          )}
+                          {shipping === 0 ? <span className="text-green-600">Free</span> : `₹${shipping}`}
                         </span>
                       </div>
                       {shipping > 0 && (
@@ -275,7 +275,9 @@ function CartPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div className="flex-1">
-                              <p className="text-xs font-medium text-amber-800">Spend ₹{3000 - subtotal} more for free shipping!</p>
+                              <p className="text-xs font-medium text-amber-800">
+                                Spend ₹{3000 - subtotal} more for free shipping!
+                              </p>
                               <div className="w-full bg-amber-200 rounded-full h-1.5 mt-1">
                                 <div
                                   className="bg-amber-500 h-1.5 rounded-full transition-all duration-500"
@@ -301,8 +303,7 @@ function CartPage() {
 
                     {/* Checkout Button */}
                     <button
-                      // onClick={() => navigate('/checkout')}
-                      onClick={() => navigateCeckout()}
+                      onClick={navigateCheckout}
                       disabled={cartItems.length === 0}
                       className={`w-full py-3 rounded-lg cursor-pointer font-bold text-sm sm:text-base transition-all duration-200 ${cartItems.length === 0
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
@@ -319,7 +320,7 @@ function CartPage() {
         </div>
       </div>
     </ScrollReveal>
-  )
+  );
 }
 
-export default CartPage
+export default CartPage;

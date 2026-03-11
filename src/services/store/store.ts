@@ -14,7 +14,8 @@ import userDataSlice from "./slice/user/userDataSlice";
 import cartDataSlice from "./slice/cart/cartDataSlice";
 import watchListProductSlice from "./slice/watchlist/watchlistProductSlice";
 import watchListMainProductSlice from "./slice/watchlist/watchListMainProductSlice";
-
+import paymentInfoSlice from "./slice/paymentInfo/paymentInfoSlice";
+import orderSlice from './slice/order/orderSlice'
 const rootReducer: any = combineReducers({
   auth: authReducer,
   loader: loadingSlice,
@@ -26,6 +27,8 @@ const rootReducer: any = combineReducers({
   cartDataSlice: cartDataSlice,
   watchlistSlice: watchListProductSlice,
   watchlistMainSlice: watchListMainProductSlice,
+  paymentInfoSlice: paymentInfoSlice,
+  orderSlice: orderSlice,
 });
 
 const persistConfig = {

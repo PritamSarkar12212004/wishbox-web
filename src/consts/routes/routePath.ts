@@ -11,6 +11,8 @@ const routePath = {
     SHOW_PRODUCT_PAGE: "/show",
     SHOW_PRODUCT_list_PAGE: "/list",
     COLLECTIONIMG_PAGE: "/collection-img",
+    PAYMENT_PAGE: "/payment_page",
+    ORDER_PAGE: "/order_page",
   },
 };
 export default routePath;
