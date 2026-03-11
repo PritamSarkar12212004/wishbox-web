@@ -40,6 +40,9 @@ const apiPath = {
   },
   SHIPROCKET: {
     AUTH_TOKEN: "https://apiv2.shiprocket.in/v1/external/auth/login",
+    CHECK_COURIER:
+      "https://apiv2.shiprocket.in/v1/external/courier/serviceability",
+    CHECK_ADDRESS: "https://api.postalpincode.in/pincode/",
   },
 };
 export default apiPath;

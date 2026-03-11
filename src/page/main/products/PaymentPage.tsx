@@ -26,6 +26,10 @@ import { IoMdClose } from 'react-icons/io';
 import ApiCallFetchPaymentInfo from '../../../api/payment/ApiCallFetchPaymentInfo';
 import ApiCalllCancelOrder from '../../../api/order/ApiCalllCancelOrder';
 import ApiCallShiprocketAuth from '../../../api/shiprocket/ApiCallShiprocketAuth';
+import ApiCallFetchAddress from '../../../api/shiprocket/ApiCallFetchAddress';
+import ApiCallcheckCourier from '../../../api/shiprocket/ApiCallcheckCourier';
+import shiprocketConfigFile from '../../../consts/shiprocket/shiprocketConfigFile';
+import paymentQrCode from '../../../components/qrcode/paymentQrCode';
 
 // Types
 interface OrderItem {
@@ -69,11 +73,11 @@ interface PaymentInfo {
 
 interface Address {
     fullName: string;
+    pincode: string;
     addressLine: string;
     city: string;
     district: string;
     state: string;
-    pincode: string;
 }
 
 const statusSteps = [
@@ -83,32 +87,25 @@ const statusSteps = [
     { key: 'delivered', label: 'Delivered', icon: FaCheck },
 ];
 
-// Dummy delivery charge calculator – replace with your logic
-const calculateDeliveryCharge = (pincode: string): number => {
-    if (pincode.startsWith('1')) return 50;
-    if (pincode.startsWith('2')) return 60;
-    if (pincode.startsWith('3')) return 70;
-    return 80;
-};
-
 const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const [qrCode, setQrCode] = useState<string>("");
     const paymentInfo = useSelector((state: any) => state.paymentInfoSlice?.paymentInfoData) as PaymentInfo | null;
     const userId = useSelector((state: any) => state.userDataSlice.mainUserID);
+    const shiprocketToken = useSelector((state: any) => state.shipRocketSlice?.token);
 
-    // Step management: 'address' or 'payment'
+    // Step management
     const [currentStep, setCurrentStep] = useState<'address' | 'payment'>('address');
 
     const [address, setAddress] = useState<Address>({
         fullName: '',
+        pincode: '',
         addressLine: '',
         city: '',
         district: '',
         state: '',
-        pincode: '',
     });
 
     const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
@@ -123,6 +120,10 @@ const PaymentPage = () => {
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const [cancelSuccess, setCancelSuccess] = useState(false);
+    const [fetchingAddress, setFetchingAddress] = useState(false);
+    const [calculatingDelivery, setCalculatingDelivery] = useState(false);
+
+    // Load order data from navigation
     useEffect(() => {
         if (location.state?.fullData) {
             setOrdersData(location.state.item as OrderData);
@@ -130,14 +131,14 @@ const PaymentPage = () => {
             console.error('No order data found');
         }
     }, [location.state]);
+
+    // Fetch payment info and generate ShipRocket token
     useEffect(() => {
-        ApiCallShiprocketAuth({
-            dispatch: dispatch
-        })
         const fetchPaymentInfo = async () => {
             setLoading(true);
             try {
                 await ApiCallFetchPaymentInfo({ dispatch });
+                await ApiCallShiprocketAuth({ dispatch }); // token stored in Redux
             } catch (error) {
                 console.error('Failed to fetch payment info:', error);
             } finally {
@@ -147,21 +148,82 @@ const PaymentPage = () => {
         fetchPaymentInfo();
     }, [dispatch]);
 
-    // Handlers
+    useEffect(() => {
+        const fetchAddress = async () => {
+            if (address.pincode.length === 6) {
+                setFetchingAddress(true);
+                try {
+                    const result = await ApiCallFetchAddress({ pincode: address.pincode });
+                    if (result) {
+                        setAddress(prev => ({
+                            ...prev,
+                            city: result.city || '',
+                            district: result.district || '',
+                            state: result.state || '',
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Address fetch failed:', error);
+                } finally {
+                    setFetchingAddress(false);
+                }
+            }
+        };
+        fetchAddress();
+    }, [address.pincode]);
+    useEffect(() => {
+
+        const generateQr = async () => {
+
+            if (
+                currentStep === "payment" &&
+                paymentInfo?.upiId &&
+                totalWithDelivery
+            ) {
+
+                const qr = await paymentQrCode({
+                    amount: totalWithDelivery,
+                    upiID: paymentInfo.upiId,
+                    name: paymentInfo.accountName || "Payment",
+                    orderId: ordersData.orderId
+                });
+
+                setQrCode(qr);
+
+            }
+
+        };
+
+        generateQr();
+
+    }, [currentStep, paymentInfo, totalWithDelivery]);
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setAddress(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleAddressSubmit = (e: React.FormEvent) => {
+    const handleAddressSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const charge = calculateDeliveryCharge(address.pincode);
-        setDeliveryCharge(charge);
-        if (ordersData) {
+        if (!ordersData) return;
+        setCalculatingDelivery(true);
+        try {
+            const pickupPostcode = shiprocketConfigFile.pickupPostcode || '411061';
+            const weight = ordersData?.totalWeight ? ordersData?.totalWeight : 1;
+            const courierResult = await ApiCallcheckCourier({
+                token: shiprocketToken,
+                pickupPostcode,
+                deliveryPostcode: address.pincode,
+                weight,
+            });
+            const charge = courierResult?.price || 0;
+            setDeliveryCharge(charge);
             setTotalWithDelivery(ordersData.totalAmount + charge);
+            setCurrentStep('payment');
+        } catch (error) {
+            console.error('Courier calculation failed:', error);
+        } finally {
+            setCalculatingDelivery(false);
         }
-        setCurrentStep('payment');
-        console.log('Address saved:', address);
     };
 
     const handleCopy = async () => {
@@ -246,7 +308,7 @@ const PaymentPage = () => {
         return item.product?.title || item.title || 'Product';
     };
 
-    // Loading / Error states
+    // Loading states
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -264,7 +326,7 @@ const PaymentPage = () => {
                     <p className="text-gray-600 mb-6">We couldn't find your order details. Please contact support.</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
+                        className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
                     >
                         Go to Home
                     </button>
@@ -277,7 +339,7 @@ const PaymentPage = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-6">
-                {/* ORDER SUMMARY CARD (always shown) */}
+                {/* ORDER SUMMARY CARD */}
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
                     <div className="p-6 sm:p-8">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -319,7 +381,7 @@ const PaymentPage = () => {
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-500 border-b border-gray-100 pb-4">
                                 <div>
                                     <span className="font-medium text-gray-700">Order ID:</span>{' '}
-                                    <span className="font-mono">{ordersData.orderId}</span>
+                                    <span className="font-mono break-all">{ordersData.orderId}</span>
                                 </div>
                                 <div className="hidden sm:block text-gray-300">|</div>
                                 <div>
@@ -340,7 +402,7 @@ const PaymentPage = () => {
                                         const title = getItemTitle(item);
                                         const quantity = item.quantity || 1;
                                         const price = item.price || 0;
-                                        const subtotal = price * quantity;
+                                        const total = price * quantity;
 
                                         return (
                                             <div key={idx} className="flex flex-col sm:flex-row sm:items-center py-4 gap-4">
@@ -359,8 +421,8 @@ const PaymentPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-sm text-gray-500">Subtotal</p>
-                                                    <p className="text-lg font-semibold text-gray-900">₹{subtotal}</p>
+                                                    <p className="text-sm text-gray-500">Total</p>
+                                                    <p className="text-lg font-semibold text-gray-900">₹{total}</p>
                                                 </div>
                                             </div>
                                         );
@@ -391,12 +453,12 @@ const PaymentPage = () => {
                             </div>
                             <p className="text-xs text-gray-500 text-right">Inclusive of all taxes</p>
 
-                            {/* Cancel button - only if cancellable */}
+                            {/* Cancel button */}
                             {canCancel && (
                                 <div className="flex justify-end">
                                     <button
                                         onClick={() => setCancelModalOpen(true)}
-                                        className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition text-sm font-medium"
+                                        className="w-full sm:w-auto px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition text-sm font-medium"
                                     >
                                         Cancel Order
                                     </button>
@@ -406,7 +468,7 @@ const PaymentPage = () => {
                     </div>
                 </div>
 
-                {/* ===== CANCELLED ORDER MESSAGE ===== */}
+                {/* CANCELLED ORDER MESSAGE */}
                 {isCancelled && (
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                         <div className="p-6 sm:p-8">
@@ -421,7 +483,7 @@ const PaymentPage = () => {
                     </div>
                 )}
 
-                {/* ===== FOR NON-CANCELLED ORDERS ===== */}
+                {/* FOR NON-CANCELLED ORDERS */}
                 {!isCancelled && (
                     <>
                         {/* ORDER TIMELINE (if payment completed) */}
@@ -432,38 +494,41 @@ const PaymentPage = () => {
                                         <FaBoxOpen className="text-indigo-500" />
                                         Order Status
                                     </h2>
-                                    <div className="relative">
-                                        <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded"></div>
-                                        <div
-                                            className="absolute top-5 left-0 h-1 bg-indigo-600 rounded transition-all duration-500"
-                                            style={{ width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%` }}
-                                        ></div>
-                                        <div className="relative flex justify-between">
-                                            {statusSteps.map((step, index) => {
-                                                const Icon = step.icon;
-                                                const isActive = index <= currentStatusIndex;
-                                                const isCurrent = index === currentStatusIndex;
-                                                return (
-                                                    <div key={step.key} className="flex flex-col items-center text-center">
-                                                        <div
-                                                            className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${isActive
-                                                                ? 'bg-indigo-600 text-white'
-                                                                : 'bg-gray-200 text-gray-500'
-                                                                } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
-                                                        >
-                                                            <Icon className="w-5 h-5" />
+                                    {/* Timeline container with horizontal scroll on small screens */}
+                                    <div className="overflow-x-auto pb-2">
+                                        <div className="relative min-w-[500px] sm:min-w-0">
+                                            <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded"></div>
+                                            <div
+                                                className="absolute top-5 left-0 h-1 bg-indigo-600 rounded transition-all duration-500"
+                                                style={{ width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%` }}
+                                            ></div>
+                                            <div className="relative flex justify-between">
+                                                {statusSteps.map((step, index) => {
+                                                    const Icon = step.icon;
+                                                    const isActive = index <= currentStatusIndex;
+                                                    const isCurrent = index === currentStatusIndex;
+                                                    return (
+                                                        <div key={step.key} className="flex flex-col items-center text-center">
+                                                            <div
+                                                                className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${isActive
+                                                                    ? 'bg-indigo-600 text-white'
+                                                                    : 'bg-gray-200 text-gray-500'
+                                                                    } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
+                                                            >
+                                                                <Icon className="w-5 h-5" />
+                                                            </div>
+                                                            <span className="text-xs mt-2 font-medium text-gray-700">{step.label}</span>
                                                         </div>
-                                                        <span className="text-xs mt-2 font-medium text-gray-700">{step.label}</span>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* STEP 1: ADDRESS FORM (only if waiting and address step) */}
+                        {/* STEP 1: ADDRESS FORM */}
                         {isWaiting && currentStep === 'address' && (
                             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                                 <div className="p-6 sm:p-8">
@@ -485,6 +550,27 @@ const PaymentPage = () => {
                                                 required
                                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                             />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="pincode" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Pincode <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="pincode"
+                                                name="pincode"
+                                                value={address.pincode}
+                                                onChange={handleAddressChange}
+                                                required
+                                                pattern="[0-9]{6}"
+                                                maxLength={6}
+                                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            />
+                                            {fetchingAddress && (
+                                                <p className="text-xs text-indigo-600 mt-1 flex items-center gap-1">
+                                                    <FaSpinner className="animate-spin" /> Fetching address...
+                                                </p>
+                                            )}
                                         </div>
                                         <div>
                                             <label htmlFor="addressLine" className="block text-sm font-medium text-gray-700 mb-1">
@@ -545,35 +631,27 @@ const PaymentPage = () => {
                                                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                                                 />
                                             </div>
-                                            <div>
-                                                <label htmlFor="pincode" className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Pincode <span className="text-red-500">*</span>
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    id="pincode"
-                                                    name="pincode"
-                                                    value={address.pincode}
-                                                    onChange={handleAddressChange}
-                                                    required
-                                                    pattern="[0-9]{6}"
-                                                    maxLength={6}
-                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                                />
-                                            </div>
                                         </div>
                                         <button
                                             type="submit"
-                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 mt-4"
+                                            disabled={calculatingDelivery || fetchingAddress}
+                                            className="w-full bg-indigo-600 cursor-pointer hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 mt-4 flex items-center justify-center gap-2"
                                         >
-                                            Continue to Payment
+                                            {calculatingDelivery ? (
+                                                <>
+                                                    <FaSpinner className="animate-spin" />
+                                                    Calculating Delivery...
+                                                </>
+                                            ) : (
+                                                'Continue to Payment'
+                                            )}
                                         </button>
                                     </form>
                                 </div>
                             </div>
                         )}
 
-                        {/* STEP 2: PAYMENT + UTR SUBMISSION (only if waiting and payment step) */}
+                        {/* STEP 2: PAYMENT + UTR SUBMISSION */}
                         {isWaiting && currentStep === 'payment' && (
                             <>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -587,13 +665,13 @@ const PaymentPage = () => {
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm sm:text-base">
+                                                        <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm sm:text-base break-all">
                                                             {paymentInfo?.upiId || 'N/A'}
                                                         </div>
                                                         <button
                                                             onClick={handleCopy}
                                                             disabled={!paymentInfo?.upiId}
-                                                            className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative group"
+                                                            className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative group flex-shrink-0"
                                                             title="Copy UPI ID"
                                                         >
                                                             {copySuccess ? (
@@ -617,9 +695,9 @@ const PaymentPage = () => {
                                             </div>
                                             <div className="space-y-4">
                                                 <div className="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
-                                                    {paymentInfo?.qrImageUrl ? (
+                                                    {qrCode ? (
                                                         <img
-                                                            src={paymentInfo.qrImageUrl}
+                                                            src={qrCode}
                                                             alt="UPI QR Code"
                                                             className="w-48 h-48 object-contain rounded-xl"
                                                         />
@@ -641,11 +719,11 @@ const PaymentPage = () => {
                                             <FiHelpCircle className="w-5 h-5 text-indigo-500" />
                                             How to pay
                                         </h2>
-                                        <ol className="list-decimal list-inside space-y-3 text-gray-700">
+                                        <ol className="list-decimal list-inside space-y-3 text-gray-700 text-sm sm:text-base">
                                             <li>Open your UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
                                             <li>
                                                 Scan the QR code or send payment to{' '}
-                                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">
+                                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm break-all">
                                                     {paymentInfo?.upiId || 'N/A'}
                                                 </span>
                                             </li>
@@ -666,7 +744,7 @@ const PaymentPage = () => {
                                                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                                                     Payment Submitted Successfully
                                                 </h3>
-                                                <p className="text-gray-600 mb-4">
+                                                <p className="text-gray-600 mb-4 break-all">
                                                     Your UTR <span className="font-mono bg-white px-2 py-1 rounded">{utr}</span> has been
                                                     received.
                                                 </p>
@@ -718,8 +796,8 @@ const PaymentPage = () => {
                                                         </label>
                                                     </div>
                                                     {screenshot && (
-                                                        <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
-                                                            <FaCheck className="text-green-500" /> Selected: {screenshot.name}
+                                                        <p className="text-sm text-gray-600 mt-2 flex items-center gap-1 break-all">
+                                                            <FaCheck className="text-green-500 flex-shrink-0" /> Selected: {screenshot.name}
                                                         </p>
                                                     )}
                                                 </div>
@@ -727,7 +805,7 @@ const PaymentPage = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={!utr || submitting}
-                                                    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+                                                    className="w-full bg-indigo-600 cursor-pointer hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
                                                 >
                                                     {submitting ? (
                                                         <>
@@ -747,7 +825,7 @@ const PaymentPage = () => {
                     </>
                 )}
 
-                {/* PAYMENT STATUS CARD (always shown) */}
+                {/* PAYMENT STATUS CARD */}
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                     <div className="p-6 sm:p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Status</h2>
@@ -775,7 +853,7 @@ const PaymentPage = () => {
                                             : 'Payment Failed'}
                                 </span>
                                 {isCompleted && ordersData.payment.utr && (
-                                    <span className="text-sm text-gray-600">UTR: {ordersData.payment.utr}</span>
+                                    <span className="text-sm text-gray-600 break-all">UTR: {ordersData.payment.utr}</span>
                                 )}
                             </div>
                             <p className="text-gray-700">
@@ -847,7 +925,7 @@ const PaymentPage = () => {
                 {/* CANCEL ORDER MODAL */}
                 {cancelModalOpen && (
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+                        <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-xl font-bold text-gray-900">Cancel Order</h3>
                                 <button
@@ -867,7 +945,7 @@ const PaymentPage = () => {
                                     <p className="text-gray-600 mb-6">
                                         Are you sure you want to cancel this order? This action cannot be undone.
                                     </p>
-                                    <div className="flex gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-3">
                                         <button
                                             onClick={handleCancelOrder}
                                             disabled={cancelling}
