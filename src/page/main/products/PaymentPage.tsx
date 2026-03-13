@@ -28,8 +28,8 @@ import ApiCalllCancelOrder from '../../../api/order/ApiCalllCancelOrder';
 import ApiCallShiprocketAuth from '../../../api/shiprocket/ApiCallShiprocketAuth';
 import ApiCallFetchAddress from '../../../api/shiprocket/ApiCallFetchAddress';
 import ApiCallcheckCourier from '../../../api/shiprocket/ApiCallcheckCourier';
+import ApiCallPaymentSubmit from '../../../api/payment/ApiCallPaymentSubmit';
 import shiprocketConfigFile from '../../../consts/shiprocket/shiprocketConfigFile';
-import paymentQrCode from '../../../components/qrcode/paymentQrCode';
 
 // Types
 interface OrderItem {
@@ -51,7 +51,7 @@ interface OrderData {
     items: OrderItem[];
     totalAmount: number;
     payment: {
-        paymentStatus: 'waiting_payment' | 'completed' | 'failed';
+        paymentStatus: 'waiting_payment' | 'pending_verification' | 'paid' | 'failed';
         utr: string | null;
     };
     orderStatus: string;
@@ -81,8 +81,11 @@ interface Address {
 }
 
 const statusSteps = [
+    { key: 'checkout_initiated', label: 'Checkout Initiated', icon: FaHourglassHalf },
     { key: 'payment_pending', label: 'Payment Pending', icon: FaHourglassHalf },
-    { key: 'processing', label: 'Processing', icon: FaSpinner },
+    { key: 'payment_verification', label: 'Verifying Payment', icon: FaSpinner },
+    { key: 'order_placed', label: 'Order Placed', icon: FaRegCheckCircle },
+    { key: 'confirmed', label: 'Confirmed', icon: FaCheck },
     { key: 'shipped', label: 'Shipped', icon: FaTruck },
     { key: 'delivered', label: 'Delivered', icon: FaCheck },
 ];
@@ -91,7 +94,7 @@ const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [qrCode, setQrCode] = useState<string>("");
+
     const paymentInfo = useSelector((state: any) => state.paymentInfoSlice?.paymentInfoData) as PaymentInfo | null;
     const userId = useSelector((state: any) => state.userDataSlice.mainUserID);
     const shiprocketToken = useSelector((state: any) => state.shipRocketSlice?.token);
@@ -148,6 +151,7 @@ const PaymentPage = () => {
         fetchPaymentInfo();
     }, [dispatch]);
 
+    // Auto-fill address when pincode is 6 digits
     useEffect(() => {
         const fetchAddress = async () => {
             if (address.pincode.length === 6) {
@@ -171,32 +175,8 @@ const PaymentPage = () => {
         };
         fetchAddress();
     }, [address.pincode]);
-    useEffect(() => {
 
-        const generateQr = async () => {
-
-            if (
-                currentStep === "payment" &&
-                paymentInfo?.upiId &&
-                totalWithDelivery
-            ) {
-
-                const qr = await paymentQrCode({
-                    amount: totalWithDelivery,
-                    upiID: paymentInfo.upiId,
-                    name: paymentInfo.accountName || "Payment",
-                    orderId: ordersData.orderId
-                });
-
-                setQrCode(qr);
-
-            }
-
-        };
-
-        generateQr();
-
-    }, [currentStep, paymentInfo, totalWithDelivery]);
+    // Handlers
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setAddress(prev => ({ ...prev, [name]: value }));
@@ -243,15 +223,26 @@ const PaymentPage = () => {
         }
     };
 
+    // Real payment submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!utr || !ordersData?._id) return;
 
         setSubmitting(true);
         try {
-            // Replace with your actual submit API
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setSubmitted(true);
+            await ApiCallPaymentSubmit({
+                deliveryCharge: deliveryCharge,
+                totoalPrice: ordersData.totalAmount,
+                userInfor: address,
+                orderID: ordersData.orderId,
+                userId: userId,
+                utrValue: utr,
+                dispatch: dispatch,
+                updateOrderStatusInState: (newStatus: string) => {
+                    setOrdersData(prev => prev ? { ...prev, orderStatus: newStatus } : null);
+                    setSubmitted(true);
+                }
+            });
         } catch (error) {
             console.error('Submission failed:', error);
         } finally {
@@ -288,13 +279,18 @@ const PaymentPage = () => {
 
     // Derived state
     const paymentStatus = ordersData?.payment?.paymentStatus || 'waiting_payment';
-    const isWaiting = paymentStatus === 'waiting_payment';
-    const isCompleted = paymentStatus === 'completed';
+    const orderStatus = ordersData?.orderStatus || 'checkout_initiated';
 
-    const orderStatus = ordersData?.orderStatus || 'payment_pending';
+    const isWaiting = paymentStatus === 'waiting_payment';
+    const isPendingVerification = paymentStatus === 'pending_verification';
+    const isPaid = paymentStatus === 'paid';
+    const isFailed = paymentStatus === 'failed';
     const isCancelled = orderStatus === 'cancelled';
+
     const currentStatusIndex = statusSteps.findIndex(s => s.key === orderStatus);
-    const canCancel = isWaiting && !['cancelled', 'completed', 'shipped', 'delivered'].includes(orderStatus);
+
+    // Cancel allowed only during payment pending (waiting_payment) and not cancelled/paid/shipped/delivered
+    const canCancel = isWaiting && !['cancelled', 'paid', 'shipped', 'delivered'].includes(orderStatus);
 
     const getItemImage = (item: OrderItem): string => {
         return (
@@ -308,7 +304,7 @@ const PaymentPage = () => {
         return item.product?.title || item.title || 'Product';
     };
 
-    // Loading states
+    // Loading / Error states
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -347,26 +343,36 @@ const PaymentPage = () => {
                             <div className="flex items-center gap-3 flex-wrap">
                                 <span
                                     className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${isCancelled
-                                        ? 'bg-red-100 text-red-800'
-                                        : isWaiting
-                                            ? 'bg-amber-100 text-amber-800'
-                                            : isCompleted
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
+                                            ? 'bg-red-100 text-red-800'
+                                            : isPendingVerification
+                                                ? 'bg-blue-100 text-blue-800'
+                                                : isWaiting
+                                                    ? 'bg-amber-100 text-amber-800'
+                                                    : isPaid
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : isFailed
+                                                            ? 'bg-red-100 text-red-800'
+                                                            : 'bg-gray-100 text-gray-800'
                                         }`}
                                 >
                                     {isCancelled ? (
                                         <FaTimesCircle className="mr-2" />
+                                    ) : isPendingVerification ? (
+                                        <FaSpinner className="mr-2 animate-spin" />
                                     ) : isWaiting ? (
                                         <FaHourglassHalf className="mr-2" />
-                                    ) : isCompleted ? (
+                                    ) : isPaid ? (
                                         <FaRegCheckCircle className="mr-2" />
-                                    ) : (
+                                    ) : isFailed ? (
                                         <FaTimesCircle className="mr-2" />
-                                    )}
-                                    {isCancelled ? 'Cancelled' : ordersData.orderStatus || 'Payment Pending'}
+                                    ) : null}
+                                    {isCancelled
+                                        ? 'Cancelled'
+                                        : isPendingVerification
+                                            ? 'Payment Verification'
+                                            : ordersData.orderStatus || 'Payment Pending'}
                                 </span>
-                                {isCompleted && (
+                                {isPaid && (
                                     <button
                                         onClick={handleDownloadInvoice}
                                         className="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-semibold hover:bg-indigo-100 transition"
@@ -453,7 +459,7 @@ const PaymentPage = () => {
                             </div>
                             <p className="text-xs text-gray-500 text-right">Inclusive of all taxes</p>
 
-                            {/* Cancel button */}
+                            {/* Cancel button - only shown during payment pending */}
                             {canCancel && (
                                 <div className="flex justify-end">
                                     <button
@@ -486,7 +492,7 @@ const PaymentPage = () => {
                 {/* FOR NON-CANCELLED ORDERS */}
                 {!isCancelled && (
                     <>
-                        {/* ORDER TIMELINE (if payment completed) */}
+                        {/* ORDER TIMELINE (if payment completed or verification) */}
                         {!isWaiting && (
                             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                                 <div className="p-6 sm:p-8">
@@ -494,9 +500,9 @@ const PaymentPage = () => {
                                         <FaBoxOpen className="text-indigo-500" />
                                         Order Status
                                     </h2>
-                                    {/* Timeline container with horizontal scroll on small screens */}
+                                    {/* Responsive timeline with horizontal scroll on mobile */}
                                     <div className="overflow-x-auto pb-2">
-                                        <div className="relative min-w-[500px] sm:min-w-0">
+                                        <div className="relative min-w-[600px] sm:min-w-0">
                                             <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded"></div>
                                             <div
                                                 className="absolute top-5 left-0 h-1 bg-indigo-600 rounded transition-all duration-500"
@@ -511,13 +517,15 @@ const PaymentPage = () => {
                                                         <div key={step.key} className="flex flex-col items-center text-center">
                                                             <div
                                                                 className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${isActive
-                                                                    ? 'bg-indigo-600 text-white'
-                                                                    : 'bg-gray-200 text-gray-500'
+                                                                        ? 'bg-indigo-600 text-white'
+                                                                        : 'bg-gray-200 text-gray-500'
                                                                     } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
                                                             >
                                                                 <Icon className="w-5 h-5" />
                                                             </div>
-                                                            <span className="text-xs mt-2 font-medium text-gray-700">{step.label}</span>
+                                                            <span className="text-xs mt-2 font-medium text-gray-700 max-w-[70px] truncate sm:max-w-none sm:whitespace-normal">
+                                                                {step.label}
+                                                            </span>
                                                         </div>
                                                     );
                                                 })}
@@ -528,7 +536,22 @@ const PaymentPage = () => {
                             </div>
                         )}
 
-                        {/* STEP 1: ADDRESS FORM */}
+                        {/* PAYMENT UNDER VERIFICATION MESSAGE */}
+                        {isPendingVerification && (
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                <div className="p-6 sm:p-8">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+                                        <FaSpinner className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+                                        <h2 className="text-xl font-bold text-gray-900 mb-2">Payment Under Verification</h2>
+                                        <p className="text-gray-600">
+                                            Your payment is being verified. This usually takes a few minutes. You will receive a confirmation once done.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* STEP 1: ADDRESS FORM (only if waiting and address step) */}
                         {isWaiting && currentStep === 'address' && (
                             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                                 <div className="p-6 sm:p-8">
@@ -635,7 +658,7 @@ const PaymentPage = () => {
                                         <button
                                             type="submit"
                                             disabled={calculatingDelivery || fetchingAddress}
-                                            className="w-full bg-indigo-600 cursor-pointer hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 mt-4 flex items-center justify-center gap-2"
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 mt-4 flex items-center justify-center gap-2"
                                         >
                                             {calculatingDelivery ? (
                                                 <>
@@ -651,7 +674,7 @@ const PaymentPage = () => {
                             </div>
                         )}
 
-                        {/* STEP 2: PAYMENT + UTR SUBMISSION */}
+                        {/* STEP 2: PAYMENT + UTR SUBMISSION (only if waiting and payment step) */}
                         {isWaiting && currentStep === 'payment' && (
                             <>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -695,9 +718,9 @@ const PaymentPage = () => {
                                             </div>
                                             <div className="space-y-4">
                                                 <div className="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
-                                                    {qrCode ? (
+                                                    {paymentInfo?.qrImageUrl ? (
                                                         <img
-                                                            src={qrCode}
+                                                            src={paymentInfo.qrImageUrl}
                                                             alt="UPI QR Code"
                                                             className="w-48 h-48 object-contain rounded-xl"
                                                         />
@@ -805,7 +828,7 @@ const PaymentPage = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={!utr || submitting}
-                                                    className="w-full bg-indigo-600 cursor-pointer hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+                                                    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
                                                 >
                                                     {submitting ? (
                                                         <>
@@ -830,38 +853,57 @@ const PaymentPage = () => {
                     <div className="p-6 sm:p-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Status</h2>
                         <div
-                            className={`rounded-xl p-6 ${isWaiting
-                                ? 'bg-amber-50 border border-amber-200'
-                                : isCompleted
-                                    ? 'bg-green-50 border border-green-200'
-                                    : 'bg-red-50 border border-red-200'
+                            className={`rounded-xl p-6 ${isPendingVerification
+                                    ? 'bg-blue-50 border border-blue-200'
+                                    : isWaiting
+                                        ? 'bg-amber-50 border border-amber-200'
+                                        : isPaid
+                                            ? 'bg-green-50 border border-green-200'
+                                            : isFailed
+                                                ? 'bg-red-50 border border-red-200'
+                                                : 'bg-gray-50 border border-gray-200'
                                 }`}
                         >
                             <div className="flex items-center gap-3 mb-3 flex-wrap">
                                 <span
-                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isWaiting
-                                        ? 'bg-amber-200 text-amber-800'
-                                        : isCompleted
-                                            ? 'bg-green-200 text-green-800'
-                                            : 'bg-red-200 text-red-800'
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isPendingVerification
+                                            ? 'bg-blue-200 text-blue-800'
+                                            : isWaiting
+                                                ? 'bg-amber-200 text-amber-800'
+                                                : isPaid
+                                                    ? 'bg-green-200 text-green-800'
+                                                    : isFailed
+                                                        ? 'bg-red-200 text-red-800'
+                                                        : 'bg-gray-200 text-gray-800'
                                         }`}
                                 >
-                                    {isWaiting
-                                        ? 'Pending Verification'
-                                        : isCompleted
-                                            ? 'Payment Completed'
-                                            : 'Payment Failed'}
+                                    {isPendingVerification
+                                        ? 'Under Verification'
+                                        : isWaiting
+                                            ? 'Pending Payment'
+                                            : isPaid
+                                                ? 'Payment Completed'
+                                                : isFailed
+                                                    ? 'Payment Failed'
+                                                    : 'Unknown'}
                                 </span>
-                                {isCompleted && ordersData.payment.utr && (
+                                {isPaid && ordersData.payment.utr && (
+                                    <span className="text-sm text-gray-600 break-all">UTR: {ordersData.payment.utr}</span>
+                                )}
+                                {isPendingVerification && ordersData.payment.utr && (
                                     <span className="text-sm text-gray-600 break-all">UTR: {ordersData.payment.utr}</span>
                                 )}
                             </div>
                             <p className="text-gray-700">
-                                {isWaiting
-                                    ? 'Our team will verify your payment soon. Once verified, your order will be confirmed.'
-                                    : isCompleted
-                                        ? 'Your payment has been successfully verified. Thank you for your purchase!'
-                                        : 'There was an issue with your payment. Please contact support.'}
+                                {isPendingVerification
+                                    ? 'Your payment is being verified. You will receive a confirmation once the verification is complete.'
+                                    : isWaiting
+                                        ? 'Please complete the payment using the options above.'
+                                        : isPaid
+                                            ? 'Your payment has been successfully verified. Thank you for your purchase!'
+                                            : isFailed
+                                                ? 'There was an issue with your payment. Please contact support.'
+                                                : 'No payment information available.'}
                             </p>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ const apiPath = {
   },
   PAYMENT_INFO: {
     FETCH_PAYMENT_INFO_ADMIN: "/payment/fetch_admin_payment_info",
+    PAYMENT_SUBMIT: "/payment/submit_payment",
   },
   CONTACT: {
     FULL_CONTACT: "/contact/full_contact",

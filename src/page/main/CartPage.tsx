@@ -34,8 +34,7 @@ function CartPage() {
       data: cartItems,
       userID: userID,
       navigate: navigate
-
-    })
+    });
   };
 
   const updateQuantity = (id: string, newQuantity: number) => {
@@ -60,13 +59,13 @@ function CartPage() {
       dispatch: dispatch,
       removeFun: removeFun,
       setRemoveLoading: (loading: boolean) => {
-        if (!loading) setRemovingId(null); // clear spinner
+        if (!loading) setRemovingId(null);
       },
     });
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 3000 ? 0 : 99;
+  // No shipping calculation – total equals subtotal
   const total = subtotal;
 
   useEffect(() => {
@@ -256,38 +255,12 @@ function CartPage() {
                   </div>
 
                   <div className="p-3 sm:p-4">
-                    {/* Price Breakdown */}
+                    {/* Price Breakdown – only subtotal now */}
                     <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Subtotal ({cartItems.length} items)</span>
                         <span className="font-medium text-gray-900">₹{subtotal}</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Shipping</span>
-                        <span className="font-medium text-gray-900">
-                          {shipping === 0 ? <span className="text-green-600">Free</span> : `₹${shipping}`}
-                        </span>
-                      </div>
-                      {shipping > 0 && (
-                        <div className="mt-2 p-2 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <div className="flex-1">
-                              <p className="text-xs font-medium text-amber-800">
-                                Spend ₹{3000 - subtotal} more for free shipping!
-                              </p>
-                              <div className="w-full bg-amber-200 rounded-full h-1.5 mt-1">
-                                <div
-                                  className="bg-amber-500 h-1.5 rounded-full transition-all duration-500"
-                                  style={{ width: `${Math.min((subtotal / 3000) * 100, 100)}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     {/* Total */}
@@ -306,8 +279,8 @@ function CartPage() {
                       onClick={navigateCheckout}
                       disabled={cartItems.length === 0}
                       className={`w-full py-3 rounded-lg cursor-pointer font-bold text-sm sm:text-base transition-all duration-200 ${cartItems.length === 0
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg'
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg'
                         }`}
                     >
                       {cartItems.length === 0 ? 'Cart is Empty' : 'Proceed to Checkout'}
