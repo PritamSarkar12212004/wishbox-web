@@ -279,8 +279,8 @@ function CartPage() {
                       onClick={navigateCheckout}
                       disabled={cartItems.length === 0}
                       className={`w-full py-3 rounded-lg cursor-pointer font-bold text-sm sm:text-base transition-all duration-200 ${cartItems.length === 0
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg'
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg'
                         }`}
                     >
                       {cartItems.length === 0 ? 'Cart is Empty' : 'Proceed to Checkout'}

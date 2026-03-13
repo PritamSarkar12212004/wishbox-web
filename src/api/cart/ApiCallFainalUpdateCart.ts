@@ -32,6 +32,8 @@ const ApiCallFainalUpdateCart = async ({
         navigate(routePath.PRIVATE_ROUTE.PAYMENT_PAGE, {
           state: {
             orderId: res.data.orderId,
+            fullData: false,
+            item: null,
           },
         });
         dispatch(mainLoaderTogel(false));

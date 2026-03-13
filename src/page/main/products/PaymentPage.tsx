@@ -30,6 +30,7 @@ import ApiCallFetchAddress from '../../../api/shiprocket/ApiCallFetchAddress';
 import ApiCallcheckCourier from '../../../api/shiprocket/ApiCallcheckCourier';
 import ApiCallPaymentSubmit from '../../../api/payment/ApiCallPaymentSubmit';
 import shiprocketConfigFile from '../../../consts/shiprocket/shiprocketConfigFile';
+import ApiFetchOrderDetiles from '../../../api/payment/ApiFetchOrderDetiles';
 
 // Types
 interface OrderItem {
@@ -126,12 +127,18 @@ const PaymentPage = () => {
     const [fetchingAddress, setFetchingAddress] = useState(false);
     const [calculatingDelivery, setCalculatingDelivery] = useState(false);
 
-    // Load order data from navigation
+
+    const fetchDataById = async () => {
+        const data = await ApiFetchOrderDetiles(location.state.orderId)
+        setOrdersData(data as OrderData);
+
+    }
     useEffect(() => {
-        if (location.state?.fullData) {
+        if (location.state?.fullData == true) {
+            console.log(location.state.item)
             setOrdersData(location.state.item as OrderData);
         } else {
-            console.error('No order data found');
+            fetchDataById()
         }
     }, [location.state]);
 
@@ -343,16 +350,16 @@ const PaymentPage = () => {
                             <div className="flex items-center gap-3 flex-wrap">
                                 <span
                                     className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${isCancelled
-                                            ? 'bg-red-100 text-red-800'
-                                            : isPendingVerification
-                                                ? 'bg-blue-100 text-blue-800'
-                                                : isWaiting
-                                                    ? 'bg-amber-100 text-amber-800'
-                                                    : isPaid
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : isFailed
-                                                            ? 'bg-red-100 text-red-800'
-                                                            : 'bg-gray-100 text-gray-800'
+                                        ? 'bg-red-100 text-red-800'
+                                        : isPendingVerification
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : isWaiting
+                                                ? 'bg-amber-100 text-amber-800'
+                                                : isPaid
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : isFailed
+                                                        ? 'bg-red-100 text-red-800'
+                                                        : 'bg-gray-100 text-gray-800'
                                         }`}
                                 >
                                     {isCancelled ? (
@@ -517,8 +524,8 @@ const PaymentPage = () => {
                                                         <div key={step.key} className="flex flex-col items-center text-center">
                                                             <div
                                                                 className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${isActive
-                                                                        ? 'bg-indigo-600 text-white'
-                                                                        : 'bg-gray-200 text-gray-500'
+                                                                    ? 'bg-indigo-600 text-white'
+                                                                    : 'bg-gray-200 text-gray-500'
                                                                     } ${isCurrent ? 'ring-4 ring-indigo-200' : ''}`}
                                                             >
                                                                 <Icon className="w-5 h-5" />
@@ -854,27 +861,27 @@ const PaymentPage = () => {
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Status</h2>
                         <div
                             className={`rounded-xl p-6 ${isPendingVerification
-                                    ? 'bg-blue-50 border border-blue-200'
-                                    : isWaiting
-                                        ? 'bg-amber-50 border border-amber-200'
-                                        : isPaid
-                                            ? 'bg-green-50 border border-green-200'
-                                            : isFailed
-                                                ? 'bg-red-50 border border-red-200'
-                                                : 'bg-gray-50 border border-gray-200'
+                                ? 'bg-blue-50 border border-blue-200'
+                                : isWaiting
+                                    ? 'bg-amber-50 border border-amber-200'
+                                    : isPaid
+                                        ? 'bg-green-50 border border-green-200'
+                                        : isFailed
+                                            ? 'bg-red-50 border border-red-200'
+                                            : 'bg-gray-50 border border-gray-200'
                                 }`}
                         >
                             <div className="flex items-center gap-3 mb-3 flex-wrap">
                                 <span
                                     className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isPendingVerification
-                                            ? 'bg-blue-200 text-blue-800'
-                                            : isWaiting
-                                                ? 'bg-amber-200 text-amber-800'
-                                                : isPaid
-                                                    ? 'bg-green-200 text-green-800'
-                                                    : isFailed
-                                                        ? 'bg-red-200 text-red-800'
-                                                        : 'bg-gray-200 text-gray-800'
+                                        ? 'bg-blue-200 text-blue-800'
+                                        : isWaiting
+                                            ? 'bg-amber-200 text-amber-800'
+                                            : isPaid
+                                                ? 'bg-green-200 text-green-800'
+                                                : isFailed
+                                                    ? 'bg-red-200 text-red-800'
+                                                    : 'bg-gray-200 text-gray-800'
                                         }`}
                                 >
                                     {isPendingVerification
