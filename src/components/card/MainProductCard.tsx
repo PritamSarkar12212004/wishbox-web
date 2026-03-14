@@ -11,7 +11,7 @@ function MainProductCard({ item, index }: { item: TypeCollection; index: number 
   const navugateScreen = (item: any) => {
     navigate(routePath.PRIVATE_ROUTE.SHOW_PRODUCT_list_PAGE, {
       state: {
-        data: item.products
+        data: item
       }
     })
   }

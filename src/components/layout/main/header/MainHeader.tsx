@@ -87,7 +87,7 @@ function MainHeader() {
             <List>
                 {[
                     ...tabs.slice(0, 2),
-                    { Title: "Collection", path: routePath.PRIVATE_ROUTE.COLLECTION_PAGE },
+                    // { Title: "Collection", path: routePath.PRIVATE_ROUTE.COLLECTION_PAGE },
                     ...tabs.slice(2)
                 ].map((item) => (
                     <ListItem key={item.Title} disablePadding>

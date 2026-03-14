@@ -44,8 +44,8 @@ function DashboardPage() {
         <ScrollReveal>
             <div className='flex-1 flex gap-8 flex-col pb-20'>
                 <DashHeroOne navigation={navigate} />
-                <MainProductOne />
-                <FullScreenPoster />
+                {/* <MainProductOne /> */}
+                {/* <FullScreenPoster /> */}
                 <MainTopSellingProducts navigation={navigate} dispatch={dispatch} />
             </div>
         </ScrollReveal>
